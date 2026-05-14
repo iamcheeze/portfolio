@@ -56,8 +56,8 @@ function App() {
       <SceneBackground />
       <main className="ui-shell">
         <div className="ui-card">
-          <p className="eyebrow">React · Vite · Three.js</p>
-          <h1>Your site</h1>
+          {/* <p className="eyebrow">React · Vite · Three.js</p> */}
+          <h1>Rayan Ghosh's Portfolio</h1>
           <p className="lede">
             This is Rayan Ghosh's Personal Website. Currently a Work in Progress.
           </p>
