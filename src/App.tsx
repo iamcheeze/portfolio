@@ -59,18 +59,16 @@ function App() {
           <p className="eyebrow">React · Vite · Three.js</p>
           <h1>Your site</h1>
           <p className="lede">
-            Standard foreground UI with a WebGL scene behind it. Edit{' '}
-            <code>src/App.tsx</code> and <code>src/SceneBackground.tsx</code> to
-            extend the layout and 3D content.
+            This is Rayan Ghosh's Personal Website. Currently a Work in Progress.
           </p>
-          <div className="ui-actions">
+          {/* <div className="ui-actions">
             <button type="button" className="btn btn-primary">
               Primary action
             </button>
             <button type="button" className="btn btn-ghost">
               Secondary
             </button>
-          </div>
+          </div> */}
         </div>
       </main>
     </div>
