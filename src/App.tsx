@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { NavButton } from './NavButton'
 import { SceneBackground } from './SceneBackground'
+import { TaglineMarquee } from './TaglineMarquee'
 import './App.css'
 
 function App() {
@@ -62,9 +63,7 @@ function App() {
 
         <header className="hero-copy">
           <h1 className="hero-title">RAYAN GHOSH</h1>
-          <p className="hero-tagline">
-            GAME DEVELOPMENT &bull; SIMULATION SOFTWARE &bull; AI ENGINEERING
-          </p>
+          <TaglineMarquee />
         </header>
         <nav className="nav-panel" aria-label="Main">
           <NavButton href="#projects">WORK</NavButton>

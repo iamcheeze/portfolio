@@ -26,6 +26,7 @@ export function SceneBackground() {
     const nearGroup = new THREE.Group()
     scene.add(farGroup, midGroup, nearGroup)
 
+    //the star object
     const starCount = 1400
     const starPos = new Float32Array(starCount * 3)
     for (let i = 0; i < starCount; i++) {
@@ -41,6 +42,7 @@ export function SceneBackground() {
     }
     const starsGeom = new THREE.BufferGeometry()
     starsGeom.setAttribute('position', new THREE.BufferAttribute(starPos, 3))
+    //star material
     const starsMat = new THREE.PointsMaterial({
       color: 0x8b9ccf,
       size: 0.045,
@@ -50,7 +52,8 @@ export function SceneBackground() {
     })
     farGroup.add(new THREE.Points(starsGeom, starsMat))
 
-    const hazeGeom = new THREE.RingGeometry(6, 9.5, 64)
+    //haze thing
+    /*const hazeGeom = new THREE.RingGeometry(6, 9.5, 64)
     const hazeMat = new THREE.MeshBasicMaterial({
       color: 0x312e81,
       transparent: true,
@@ -60,9 +63,11 @@ export function SceneBackground() {
     })
     const haze = new THREE.Mesh(hazeGeom, hazeMat)
     haze.position.z = -14
-    farGroup.add(haze)
+    farGroup.add(haze)*/
 
-    const torusGeom = new THREE.TorusGeometry(0.95, 0.32, 20, 72)
+    //3D objects
+
+    /*const torusGeom = new THREE.TorusGeometry(0.95, 0.32, 20, 72)
     const torusMat = new THREE.MeshStandardMaterial({
       color: 0x7c3aed,
       metalness: 0.55,
@@ -83,7 +88,7 @@ export function SceneBackground() {
       emissiveIntensity: 0.35,
     })
     const cube = new THREE.Mesh(boxGeom, boxMat)
-    nearGroup.add(cube)
+    nearGroup.add(cube)*/
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.35))
 
@@ -161,11 +166,11 @@ export function SceneBackground() {
       camera.position.z = camBase.z
       camera.lookAt(0, 0, 0)
 
-      torus.rotation.x += 0.0035
+      /*torus.rotation.x += 0.0035
       torus.rotation.y += 0.0055
 
       cube.rotation.x += 0.0045
-      cube.rotation.y += 0.0075
+      cube.rotation.y += 0.0075*/
 
       farGroup.rotation.z += 0.00015
 
@@ -182,12 +187,12 @@ export function SceneBackground() {
       ro.disconnect()
       starsGeom.dispose()
       starsMat.dispose()
-      hazeGeom.dispose()
+      /*hazeGeom.dispose()
       hazeMat.dispose()
       torusGeom.dispose()
       torusMat.dispose()
       boxGeom.dispose()
-      boxMat.dispose()
+      boxMat.dispose()*/
       renderer.dispose()
       renderer.domElement.remove()
     }
