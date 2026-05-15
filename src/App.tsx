@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { NavButton } from './NavButton'
 import { SceneBackground } from './SceneBackground'
 import './App.css'
 
@@ -54,22 +55,22 @@ function App() {
   return (
     <div className="app" ref={appRef}>
       <SceneBackground />
-      <main className="ui-shell">
-        <div className="ui-card">
-          {/* <p className="eyebrow">React · Vite · Three.js</p> */}
-          <h1>Rayan Ghosh's Portfolio</h1>
-          <p className="lede">
-            This is Rayan Ghosh's Personal Website. Currently a Work in Progress.
+      <div className="hero-backdrop" aria-hidden="true" />
+
+      <main className="hero">
+        <div className="hero-glow" aria-hidden="true" />
+
+        <header className="hero-copy">
+          <h1 className="hero-title">RAYAN GHOSH</h1>
+          <p className="hero-tagline">
+            GAME DEVELOPMENT &bull; SIMULATION SOFTWARE &bull; AI ENGINEERING
           </p>
-          {/* <div className="ui-actions">
-            <button type="button" className="btn btn-primary">
-              Primary action
-            </button>
-            <button type="button" className="btn btn-ghost">
-              Secondary
-            </button>
-          </div> */}
-        </div>
+        </header>
+        <nav className="nav-panel" aria-label="Main">
+          <NavButton href="#projects">WORK</NavButton>
+          <NavButton href="#about">WHO AM I?</NavButton>
+          <NavButton href="#contact">CONTACT</NavButton>
+        </nav>
       </main>
     </div>
   )

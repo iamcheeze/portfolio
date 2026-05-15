@@ -12,7 +12,7 @@ export function SceneBackground() {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x07070d)
+    scene.background = new THREE.Color(0x000b44)
 
     const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100)
     const camBase = new THREE.Vector3(0, 0, 4.25)
