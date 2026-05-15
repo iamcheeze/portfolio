@@ -6,14 +6,14 @@ import scrap2Url from './assets/Scrap2.glb?url'
 import scrap3Url from './assets/Scrap3.glb?url'
 import './SceneBackground.css'
 
-const SCRAP_URLS = [scrap1Url, scrap2Url, scrap3Url] as const
+const SCRAP_URLS = [scrap1Url, scrap2Url, scrap3Url, scrap1Url, scrap2Url, scrap3Url] as const
 const FOG_COLOR = 0x0a1654
 const NAVY = 0x000b44
 
 const DEPTH_LAYERS = [
   { zMin: -13, zMax: -9, targetSize: 1.05 },
   { zMin: -8, zMax: -5, targetSize: 1.25 },
-  { zMin: -4.5, zMax: -2, targetSize: 1.45 },
+  { zMin: -20, zMax: -15, targetSize: 1.45 },
 ] as const
 
 type ScrapInstance = {
