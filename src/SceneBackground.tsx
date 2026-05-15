@@ -113,45 +113,6 @@ function createBottomFogPlane() {
   return mesh
 }
 
-function createVolumetricFogPuffs() {
-  const group = new THREE.Group()
-  const puffs: FogPuff[] = []
-  const geo = new THREE.SphereGeometry(1, 20, 16)
-
-  for (let i = 0; i < 7; i++) {
-    const material = new THREE.MeshBasicMaterial({
-      color: 0x2a5fd4,
-      transparent: true,
-      opacity: randomRange(0.045, 0.09),
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      fog: true,
-    })
-    const mesh = new THREE.Mesh(geo, material)
-    const scale = randomRange(5.5, 11)
-    mesh.scale.setScalar(scale)
-    mesh.position.set(
-      (randomRange(-2.8, 2.8) + randomRange(-2.8, 2.8)) * 0.5,
-      (randomRange(-2, 2) + randomRange(-2, 2)) * 0.5,
-      randomRange(-11, -4),
-    )
-    group.add(mesh)
-    const baseOpacity = material.opacity
-    material.userData.baseOpacity = baseOpacity
-    puffs.push({
-      mesh,
-      drift: new THREE.Vector3(
-        randomRange(-0.0008, 0.0008),
-        randomRange(-0.0006, 0.0006),
-        randomRange(-0.0004, 0.0004),
-      ),
-      phase: randomRange(0, Math.PI * 2),
-    })
-  }
-
-  return { group, puffs, sharedGeometry: geo }
-}
-
 export function SceneBackground() {
   const containerRef = useRef<HTMLDivElement>(null)
 
@@ -172,10 +133,6 @@ export function SceneBackground() {
     const renderer = new THREE.WebGLRenderer({ antialias: true })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     container.appendChild(renderer.domElement)
-
-    const { group: volumetricFog, puffs: fogPuffs, sharedGeometry: fogGeo } =
-      createVolumetricFogPuffs()
-    scene.add(volumetricFog)
 
     const bottomFogPlane = createBottomFogPlane()
     scene.add(bottomFogPlane)
@@ -352,9 +309,6 @@ export function SceneBackground() {
       nearGroup.rotation.z = sx * 0.05
       nearGroup.rotation.x = sy * 0.04
 
-      volumetricFog.position.x = sx * 0.18
-      volumetricFog.position.y = sy * 0.12
-
       camera.position.x = camBase.x + sx * 0.12
       camera.position.y = camBase.y + sy * 0.09
       camera.position.z = camBase.z
@@ -364,13 +318,6 @@ export function SceneBackground() {
         object.rotation.x += rotSpeed.x
         object.rotation.y += rotSpeed.y
         object.rotation.z += rotSpeed.z
-      }
-
-      for (const puff of fogPuffs) {
-        puff.mesh.position.add(puff.drift)
-        const mat = puff.mesh.material as THREE.MeshBasicMaterial
-        const pulse = 1 + Math.sin(time * 0.35 + puff.phase) * 0.04
-        mat.opacity = (mat.userData.baseOpacity as number) * pulse
       }
 
       farGroup.rotation.z += 0.00015
@@ -390,12 +337,8 @@ export function SceneBackground() {
       starsGeom.dispose()
       starsMat.dispose()
       blueMaterial.dispose()
-      fogGeo.dispose()
       bottomFogPlane.geometry.dispose()
       ;(bottomFogPlane.material as THREE.ShaderMaterial).dispose()
-      for (const puff of fogPuffs) {
-        ;(puff.mesh.material as THREE.MeshBasicMaterial).dispose()
-      }
       for (const { object } of scrapInstances) {
         object.traverse((child) => {
           if (child instanceof THREE.Mesh) {
