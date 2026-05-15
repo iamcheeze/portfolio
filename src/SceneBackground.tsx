@@ -1,5 +1,156 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import scrap1Url from './assets/Scrap1.glb?url'
+import scrap2Url from './assets/Scrap2.glb?url'
+import scrap3Url from './assets/Scrap3.glb?url'
+import './SceneBackground.css'
+
+const SCRAP_URLS = [scrap1Url, scrap2Url, scrap3Url] as const
+const FOG_COLOR = 0x0a1654
+const NAVY = 0x000b44
+
+const DEPTH_LAYERS = [
+  { zMin: -13, zMax: -9, targetSize: 1.05 },
+  { zMin: -8, zMax: -5, targetSize: 1.25 },
+  { zMin: -4.5, zMax: -2, targetSize: 1.45 },
+] as const
+
+type ScrapInstance = {
+  object: THREE.Object3D
+  rotSpeed: THREE.Vector3
+}
+
+type FogPuff = {
+  mesh: THREE.Mesh
+  drift: THREE.Vector3
+  phase: number
+}
+
+function randomRange(min: number, max: number) {
+  return min + Math.random() * (max - min)
+}
+
+/** Calculates the visible camera boundaries (half-width and half-height) at a specific Z depth */
+function getCameraBoundsAtZ(camera: THREE.PerspectiveCamera, camZ: number, targetZ: number) {
+  const distance = Math.abs(camZ - targetZ)
+  
+  // Convert vertical FOV to radians
+  const vFovRad = (camera.fov * Math.PI) / 180
+  
+  // Calculate total height and width visible at this distance
+  const visibleHeight = 2 * Math.tan(vFovRad / 2) * distance
+  const visibleWidth = visibleHeight * camera.aspect
+
+  // Multiply by a slight safety buffer (0.85) so models don't clip through screen edges
+  return {
+    xMax: (visibleWidth / 2) * 0.85,
+    yMax: (visibleHeight / 2) * 0.85,
+  }
+}
+
+function createBlueMaterial() {
+  return new THREE.MeshStandardMaterial({
+    color: 0x3a86ff,
+    metalness: 0.4,
+    roughness: 0.38,
+    emissive: new THREE.Color(0x1a4db3),
+    emissiveIntensity: 0.35,
+    fog: true,
+  })
+}
+
+function applyBlueMaterial(root: THREE.Object3D, material: THREE.MeshStandardMaterial) {
+  root.traverse((child) => {
+    if (child instanceof THREE.Mesh) {
+      child.material = material
+    }
+  })
+}
+
+function normalizeAndCenter(model: THREE.Object3D, targetSize: number) {
+  const box = new THREE.Box3().setFromObject(model)
+  const size = box.getSize(new THREE.Vector3())
+  const maxDim = Math.max(size.x, size.y, size.z, 0.001)
+  model.scale.setScalar(targetSize / maxDim)
+
+  const centered = new THREE.Box3().setFromObject(model)
+  const center = centered.getCenter(new THREE.Vector3())
+  model.position.sub(center)
+}
+
+function createBottomFogPlane() {
+  const material = new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    uniforms: {
+      uColor: { value: new THREE.Color(FOG_COLOR) },
+      uDeep: { value: new THREE.Color(NAVY) },
+    },
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      varying vec2 vUv;
+      uniform vec3 uColor;
+      uniform vec3 uDeep;
+      void main() {
+        float h = smoothstep(0.08, 0.92, vUv.y);
+        float alpha = (1.0 - h) * 0.82;
+        vec3 col = mix(uDeep, uColor, h * 0.45 + 0.2);
+        gl_FragColor = vec4(col, alpha);
+      }
+    `,
+  })
+
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(52, 16), material)
+  mesh.position.set(0, -3.6, -0.25)
+  mesh.renderOrder = 10
+  return mesh
+}
+
+function createVolumetricFogPuffs() {
+  const group = new THREE.Group()
+  const puffs: FogPuff[] = []
+  const geo = new THREE.SphereGeometry(1, 20, 16)
+
+  for (let i = 0; i < 7; i++) {
+    const material = new THREE.MeshBasicMaterial({
+      color: 0x2a5fd4,
+      transparent: true,
+      opacity: randomRange(0.045, 0.09),
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      fog: true,
+    })
+    const mesh = new THREE.Mesh(geo, material)
+    const scale = randomRange(5.5, 11)
+    mesh.scale.setScalar(scale)
+    mesh.position.set(
+      (randomRange(-2.8, 2.8) + randomRange(-2.8, 2.8)) * 0.5,
+      (randomRange(-2, 2) + randomRange(-2, 2)) * 0.5,
+      randomRange(-11, -4),
+    )
+    group.add(mesh)
+    const baseOpacity = material.opacity
+    material.userData.baseOpacity = baseOpacity
+    puffs.push({
+      mesh,
+      drift: new THREE.Vector3(
+        randomRange(-0.0008, 0.0008),
+        randomRange(-0.0006, 0.0006),
+        randomRange(-0.0004, 0.0004),
+      ),
+      phase: randomRange(0, Math.PI * 2),
+    })
+  }
+
+  return { group, puffs, sharedGeometry: geo }
+}
 
 export function SceneBackground() {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -12,7 +163,8 @@ export function SceneBackground() {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 
     const scene = new THREE.Scene()
-    scene.background = new THREE.Color(0x000b44)
+    scene.background = new THREE.Color(NAVY)
+    scene.fog = new THREE.FogExp2(FOG_COLOR, 0.052)
 
     const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100)
     const camBase = new THREE.Vector3(0, 0, 4.25)
@@ -21,12 +173,19 @@ export function SceneBackground() {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     container.appendChild(renderer.domElement)
 
+    const { group: volumetricFog, puffs: fogPuffs, sharedGeometry: fogGeo } =
+      createVolumetricFogPuffs()
+    scene.add(volumetricFog)
+
+    const bottomFogPlane = createBottomFogPlane()
+    scene.add(bottomFogPlane)
+
     const farGroup = new THREE.Group()
     const midGroup = new THREE.Group()
     const nearGroup = new THREE.Group()
+    const depthGroups = [farGroup, midGroup, nearGroup]
     scene.add(farGroup, midGroup, nearGroup)
 
-    //the star object
     const starCount = 1400
     const starPos = new Float32Array(starCount * 3)
     for (let i = 0; i < starCount; i++) {
@@ -42,53 +201,15 @@ export function SceneBackground() {
     }
     const starsGeom = new THREE.BufferGeometry()
     starsGeom.setAttribute('position', new THREE.BufferAttribute(starPos, 3))
-    //star material
     const starsMat = new THREE.PointsMaterial({
       color: 0x8b9ccf,
       size: 0.045,
       transparent: true,
       opacity: 0.55,
       depthWrite: false,
+      fog: true,
     })
     farGroup.add(new THREE.Points(starsGeom, starsMat))
-
-    //haze thing
-    /*const hazeGeom = new THREE.RingGeometry(6, 9.5, 64)
-    const hazeMat = new THREE.MeshBasicMaterial({
-      color: 0x312e81,
-      transparent: true,
-      opacity: 0.12,
-      side: THREE.DoubleSide,
-      depthWrite: false,
-    })
-    const haze = new THREE.Mesh(hazeGeom, hazeMat)
-    haze.position.z = -14
-    farGroup.add(haze)*/
-
-    //3D objects
-
-    /*const torusGeom = new THREE.TorusGeometry(0.95, 0.32, 20, 72)
-    const torusMat = new THREE.MeshStandardMaterial({
-      color: 0x7c3aed,
-      metalness: 0.55,
-      roughness: 0.35,
-      emissive: new THREE.Color(0x1e1b4b),
-      emissiveIntensity: 0.2,
-    })
-    const torus = new THREE.Mesh(torusGeom, torusMat)
-    torus.position.set(0.15, -0.1, -0.35)
-    midGroup.add(torus)
-
-    const boxGeom = new THREE.BoxGeometry(1.25, 1.25, 1.25)
-    const boxMat = new THREE.MeshStandardMaterial({
-      color: 0x6366f1,
-      metalness: 0.4,
-      roughness: 0.42,
-      emissive: new THREE.Color(0x312e81),
-      emissiveIntensity: 0.35,
-    })
-    const cube = new THREE.Mesh(boxGeom, boxMat)
-    nearGroup.add(cube)*/
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.35))
 
@@ -96,14 +217,83 @@ export function SceneBackground() {
     key.position.set(4, 5, 6)
     scene.add(key)
 
-    const rim = new THREE.DirectionalLight(0xc4b5fd, 0.5)
+    const rim = new THREE.DirectionalLight(0x6b9fff, 0.65)
     rim.position.set(-5, 1, -4)
     scene.add(rim)
+
+    const blueFill = new THREE.DirectionalLight(0x3a86ff, 0.35)
+    blueFill.position.set(0, -3, 2)
+    scene.add(blueFill)
+
+    const scrapInstances: ScrapInstance[] = []
+    const blueMaterial = createBlueMaterial()
+    const loader = new GLTFLoader()
+
+    const loadScrapModels = async () => {
+      const templates = await Promise.all(
+        SCRAP_URLS.map((url) =>
+          loader.loadAsync(url).then((gltf) => {
+            if (cancelled) return null
+            const root = gltf.scene
+            applyBlueMaterial(root, blueMaterial)
+            return root
+          }),
+        ),
+      )
+
+      if (cancelled) return
+
+      // Ensure dimensions are correct on execution
+      const w = container.clientWidth
+      const h = Math.max(container.clientHeight, 1)
+      camera.aspect = w / h
+      camera.updateProjectionMatrix()
+
+      templates.forEach((template) => {
+        if (!template) return
+
+        DEPTH_LAYERS.forEach((layer, layerIndex) => {
+          const group = depthGroups[layerIndex]
+          const instance = template.clone(true)
+          normalizeAndCenter(instance, layer.targetSize)
+
+          // 1. Calculate a random depth within this layer's bounds
+          const randomZ = randomRange(layer.zMin, layer.zMax)
+
+          // 2. Query the dynamically computed maximum visual range at this depth
+          const bounds = getCameraBoundsAtZ(camera, camBase.z, randomZ)
+
+          // 3. Keep X and Y precisely within what the camera frustum sees
+          const randomX = randomRange(-bounds.xMax, bounds.xMax)
+          const randomY = randomRange(-bounds.yMax, bounds.yMax)
+
+          instance.position.set(randomX, randomY, randomZ)
+          instance.rotation.set(
+            randomRange(0, Math.PI * 2),
+            randomRange(0, Math.PI * 2),
+            randomRange(0, Math.PI * 2),
+          )
+
+          group.add(instance)
+          scrapInstances.push({
+            object: instance,
+            rotSpeed: new THREE.Vector3(
+              randomRange(0.002, 0.006) * (Math.random() > 0.5 ? 1 : -1),
+              randomRange(0.003, 0.008) * (Math.random() > 0.5 ? 1 : -1),
+              randomRange(0.001, 0.004) * (Math.random() > 0.5 ? 1 : -1),
+            ),
+          })
+        })
+      })
+    }
+
+    void loadScrapModels()
 
     let targetX = 0
     let targetY = 0
     let smoothX = 0
     let smoothY = 0
+    let time = 0
 
     const onMove = (e: PointerEvent) => {
       if (reduceMotion.matches) return
@@ -138,6 +328,7 @@ export function SceneBackground() {
     let rafId = 0
     const tick = () => {
       if (cancelled) return
+      time += 0.016
 
       const follow = reduceMotion.matches ? 1 : 0.085
       smoothX = lerp(smoothX, targetX, follow)
@@ -161,22 +352,33 @@ export function SceneBackground() {
       nearGroup.rotation.z = sx * 0.05
       nearGroup.rotation.x = sy * 0.04
 
+      volumetricFog.position.x = sx * 0.18
+      volumetricFog.position.y = sy * 0.12
+
       camera.position.x = camBase.x + sx * 0.12
       camera.position.y = camBase.y + sy * 0.09
       camera.position.z = camBase.z
       camera.lookAt(0, 0, 0)
 
-      /*torus.rotation.x += 0.0035
-      torus.rotation.y += 0.0055
+      for (const { object, rotSpeed } of scrapInstances) {
+        object.rotation.x += rotSpeed.x
+        object.rotation.y += rotSpeed.y
+        object.rotation.z += rotSpeed.z
+      }
 
-      cube.rotation.x += 0.0045
-      cube.rotation.y += 0.0075*/
+      for (const puff of fogPuffs) {
+        puff.mesh.position.add(puff.drift)
+        const mat = puff.mesh.material as THREE.MeshBasicMaterial
+        const pulse = 1 + Math.sin(time * 0.35 + puff.phase) * 0.04
+        mat.opacity = (mat.userData.baseOpacity as number) * pulse
+      }
 
       farGroup.rotation.z += 0.00015
 
       renderer.render(scene, camera)
       rafId = requestAnimationFrame(tick)
     }
+
     rafId = requestAnimationFrame(tick)
 
     return () => {
@@ -187,16 +389,33 @@ export function SceneBackground() {
       ro.disconnect()
       starsGeom.dispose()
       starsMat.dispose()
-      /*hazeGeom.dispose()
-      hazeMat.dispose()
-      torusGeom.dispose()
-      torusMat.dispose()
-      boxGeom.dispose()
-      boxMat.dispose()*/
+      blueMaterial.dispose()
+      fogGeo.dispose()
+      bottomFogPlane.geometry.dispose()
+      ;(bottomFogPlane.material as THREE.ShaderMaterial).dispose()
+      for (const puff of fogPuffs) {
+        ;(puff.mesh.material as THREE.MeshBasicMaterial).dispose()
+      }
+      for (const { object } of scrapInstances) {
+        object.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.geometry.dispose()
+            const mats = Array.isArray(child.material)
+              ? child.material
+              : [child.material]
+            mats.forEach((m) => m.dispose())
+          }
+        })
+      }
       renderer.dispose()
       renderer.domElement.remove()
     }
   }, [])
 
-  return <div ref={containerRef} className="scene-bg" aria-hidden="true" />
+  return (
+    <div className="scene-stack" aria-hidden="true">
+      <div ref={containerRef} className="scene-bg" />
+      <div className="scene-bottom-fog" />
+    </div>
+  )
 }

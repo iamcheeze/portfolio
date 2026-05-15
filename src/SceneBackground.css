@@ -1,0 +1,29 @@
+.scene-stack {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.scene-bg {
+  position: absolute;
+  inset: 0;
+}
+
+.scene-bg canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.scene-bottom-fog {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 42vh;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, #000b44 96%, #1a4db3 4%) 0%,
+    color-mix(in srgb, #0a1654 55%, transparent) 45%,
+    transparent 100%
+  );
+}
