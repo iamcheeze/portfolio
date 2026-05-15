@@ -249,6 +249,7 @@ export function SceneBackground() {
     let smoothX = 0
     let smoothY = 0
     let time = 0
+    let isMobile = false
 
     const onMove = (e: PointerEvent) => {
       if (reduceMotion.matches) return
@@ -272,6 +273,9 @@ export function SceneBackground() {
       camera.aspect = w / h
       camera.updateProjectionMatrix()
       renderer.setSize(w, h)
+
+      // Mobile check: screen width under 768px OR a touch-capable device
+      isMobile = w <= 768 || window.matchMedia('(hover: none) and (pointer: coarse)').matches
     }
 
     resize()
@@ -285,40 +289,75 @@ export function SceneBackground() {
       if (cancelled) return
       time += 0.016
 
-      const follow = reduceMotion.matches ? 1 : 0.085
-      smoothX = lerp(smoothX, targetX, follow)
-      smoothY = lerp(smoothY, targetY, follow)
+      if (isMobile) {
+        // --- MOBILE SINE WAVE ANIMATION ---
+        const mobileAmplitude = 0.6
+        const mobileSpeed = 1.0
+        const sinValue = Math.sin(time * mobileSpeed)
 
-      const sx = smoothX
-      const sy = smoothY
+        depthGroups.forEach((group, index) => {
+          // Alternating phase: 0 -> -1, 1 -> 1, 2 -> -1, 3 -> 1, 4 -> -1
+          const phaseMult = index % 2 === 0 ? -1 : 1
+          
+          group.position.y = sinValue * mobileAmplitude * phaseMult
+          
+          // Smoothly revert X position and rotations back to 0 in case user resized from desktop
+          group.position.x = lerp(group.position.x, 0, 0.05)
+          group.rotation.x = lerp(group.rotation.x, 0, 0.05)
+          group.rotation.y = lerp(group.rotation.y, 0, 0.05)
+          group.rotation.z = lerp(group.rotation.z, 0, 0.05)
+        })
 
-      farGroup.position.x = sx * 0.42
-      farGroup.position.y = sy * 0.32
-      farGroup.rotation.y = sx * 0.04
-      farGroup.rotation.x = sy * 0.025
+        // Re-center camera gently
+        camera.position.x = lerp(camera.position.x, camBase.x, 0.05)
+        camera.position.y = lerp(camera.position.y, camBase.y, 0.05)
+        camera.position.z = camBase.z
 
-      midGroup.position.x = sx * 0.95
-      midGroup.position.y = sy * 0.72
-      midGroup.rotation.x = sx * 0.08
-      midGroup.rotation.y = sy * 0.06
+      } else {
+        // --- DESKTOP PARALLAX ANIMATION ---
+        const follow = reduceMotion.matches ? 1 : 0.085
+        smoothX = lerp(smoothX, targetX, follow)
+        smoothY = lerp(smoothY, targetY, follow)
 
-      nearGroup.position.x = sx * 1.55
-      nearGroup.position.y = sy * 1.12
-      nearGroup.rotation.z = sx * 0.05
-      nearGroup.rotation.x = sy * 0.04
+        const sx = smoothX
+        const sy = smoothY
 
-      camera.position.x = camBase.x + sx * 0.12
-      camera.position.y = camBase.y + sy * 0.09
-      camera.position.z = camBase.z
+        farGroup.position.x = sx * 0.42
+        farGroup.position.y = sy * 0.32
+        farGroup.rotation.y = sx * 0.04
+        farGroup.rotation.x = sy * 0.025
+
+        midFarGroup.position.x = sx * 0.65
+        midFarGroup.position.y = sy * 0.52
+
+        midGroup.position.x = sx * 0.95
+        midGroup.position.y = sy * 0.72
+        midGroup.rotation.x = sx * 0.08
+        midGroup.rotation.y = sy * 0.06
+
+        midNearGroup.position.x = sx * 1.25
+        midNearGroup.position.y = sy * 0.92
+
+        nearGroup.position.x = sx * 1.55
+        nearGroup.position.y = sy * 1.12
+        nearGroup.rotation.z = sx * 0.05
+        nearGroup.rotation.x = sy * 0.04
+
+        camera.position.x = camBase.x + sx * 0.12
+        camera.position.y = camBase.y + sy * 0.09
+        camera.position.z = camBase.z
+      }
+
+      // Applies to both Mobile and Desktop
       camera.lookAt(0, 0, 0)
+      farGroup.rotation.z += 0.00015
 
+      // Constant local rotation for individual scrap pieces
       for (const { object, rotSpeed } of scrapInstances) {
         object.rotation.x += rotSpeed.x
         object.rotation.y += rotSpeed.y
         object.rotation.z += rotSpeed.z
       }
-
-      farGroup.rotation.z += 0.00015
 
       renderer.render(scene, camera)
       rafId = requestAnimationFrame(tick)
