@@ -11,9 +11,11 @@ const FOG_COLOR = 0x0a1654
 const NAVY = 0x000b44
 
 const DEPTH_LAYERS = [
-  { zMin: -13, zMax: -9, targetSize: 1.05 },
-  { zMin: -8, zMax: -5, targetSize: 1.25 },
-  { zMin: -20, zMax: -15, targetSize: 1.45 },
+  { zMin: -20, zMax: -15, targetSize: 0.5 },
+  { zMin: -13, zMax: -9, targetSize: 0.6 },
+  { zMin: -11, zMax: -7, targetSize: 0.7 },
+  { zMin: -8, zMax: -5, targetSize: 0.9 },
+  { zMin: -6, zMax: -3, targetSize: 1 },
 ] as const
 
 type ScrapInstance = {
@@ -132,10 +134,12 @@ export function SceneBackground() {
     scene.add(bottomFogPlane)
 
     const farGroup = new THREE.Group()
+    const midFarGroup = new THREE.Group()
     const midGroup = new THREE.Group()
+    const midNearGroup = new THREE.Group()
     const nearGroup = new THREE.Group()
-    const depthGroups = [farGroup, midGroup, nearGroup]
-    scene.add(farGroup, midGroup, nearGroup)
+    const depthGroups = [farGroup, midFarGroup, midGroup, midNearGroup, nearGroup]
+    scene.add(farGroup, midFarGroup, midGroup, midNearGroup, nearGroup)
 
     const starCount = 1400
     const starPos = new Float32Array(starCount * 3)
