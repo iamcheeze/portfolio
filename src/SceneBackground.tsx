@@ -21,12 +21,6 @@ type ScrapInstance = {
   rotSpeed: THREE.Vector3
 }
 
-type FogPuff = {
-  mesh: THREE.Mesh
-  drift: THREE.Vector3
-  phase: number
-}
-
 function randomRange(min: number, max: number) {
   return min + Math.random() * (max - min)
 }
