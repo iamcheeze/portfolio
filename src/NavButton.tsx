@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ReactNode, MouseEvent } from 'react'
 
 type NavButtonProps = {
   children: ReactNode
@@ -7,9 +7,17 @@ type NavButtonProps = {
 }
 
 export function NavButton({ children, href, onClick }: NavButtonProps) {
+  const handleClick = (e: MouseEvent) => {
+    if (onClick) {
+      // Prevent the default anchor jump so our custom transition can run
+      if (href) e.preventDefault()
+      onClick()
+    }
+  }
+
   if (href) {
     return (
-      <a className="nav-btn" href={href}>
+      <a className="nav-btn" href={href} onClick={handleClick}>
         <span className="nav-btn-face">{children}</span>
       </a>
     )

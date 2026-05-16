@@ -9,8 +9,11 @@ type Page = 'home' | 'experience'
 
 const TRANSITION_MS = 420
 
+/** * Detection logic: GitHub Pages friendly hash check 
+ */
 function getPageFromPath(): Page {
-  return window.location.pathname === '/experience' ? 'experience' : 'home'
+  const hash = window.location.hash
+  return hash === '#/experience' ? 'experience' : 'home'
 }
 
 function App() {
@@ -25,9 +28,11 @@ function App() {
 
     window.setTimeout(() => {
       setPage(nextPage)
+      
       if (pushHistory) {
-        const nextPath = nextPage === 'experience' ? '/experience' : '/'
-        window.history.pushState(null, '', nextPath)
+        // Set hash instead of pushState to prevent 404s on refresh
+        const nextHash = nextPage === 'experience' ? '#/experience' : '#/'
+        window.location.hash = nextHash
       }
 
       window.setTimeout(() => {
@@ -82,13 +87,16 @@ function App() {
     }
   }, [])
 
+  /**
+   * Listen for browser back/forward buttons using hashchange
+   */
   useEffect(() => {
-    const onPopState = () => {
+    const onHashChange = () => {
       transitionTo(getPageFromPath(), false)
     }
 
-    window.addEventListener('popstate', onPopState)
-    return () => window.removeEventListener('popstate', onPopState)
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
   }, [transitionTo])
 
   return (
@@ -102,18 +110,20 @@ function App() {
             <div className="hero-glow" aria-hidden="true" />
 
             <header className="hero-copy">
-              {/* Added fade-in-header class here */}
               <h1 className="hero-title fade-in-header">RAYAN GHOSH</h1>
-              
-              {/* Wrapped marquee in fade-in-tagline container to prevent marquee conflicts */}
               <div className="fade-in-tagline">
                 <TaglineMarquee />
               </div>
             </header>
 
-            {/* Added fade-in-nav class here */}
             <nav className="nav-panel fade-in-nav" aria-label="Main">
-              <NavButton onClick={() => transitionTo('experience')}>EXPERIENCE</NavButton>
+              {/* Added fallback href for SEO and middle-click support */}
+              <NavButton 
+                onClick={() => transitionTo('experience')} 
+                href="#/experience"
+              >
+                EXPERIENCE
+              </NavButton>
               <NavButton href="#about">WHO AM I?</NavButton>
               <NavButton href="#contact">CONTACT</NavButton>
             </nav>
