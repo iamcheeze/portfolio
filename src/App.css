@@ -781,6 +781,19 @@
   }
 }
 
+@media (max-width: 520px) {
+  .hero-glow,
+  .hero-copy,
+  .nav-panel,
+  .social-panel,
+  .experience-glow,
+  .experience-shell,
+  .catalog-shell {
+    transform: none !important;
+    will-change: auto;
+  }
+}
+
 /* ---------------- STAGGERED ENTRANCE SEQUENCING ---------------- */
 
 /* Explicit 0% and 100% pairs along with translateZ(0) 
