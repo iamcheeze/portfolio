@@ -66,7 +66,7 @@ function App() {
           <TaglineMarquee />
         </header>
         <nav className="nav-panel" aria-label="Main">
-          <NavButton href="#projects">WORK</NavButton>
+          <NavButton href="#projects">EXPERIENCE</NavButton>
           <NavButton href="#about">WHO AM I?</NavButton>
           <NavButton href="#contact">CONTACT</NavButton>
         </nav>

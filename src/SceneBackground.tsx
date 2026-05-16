@@ -6,7 +6,7 @@ import scrap2Url from './assets/Scrap2.glb?url'
 import scrap3Url from './assets/Scrap3.glb?url'
 import './SceneBackground.css'
 
-const SCRAP_URLS = [scrap1Url, scrap2Url, scrap3Url, scrap1Url, scrap2Url, scrap3Url] as const
+const SCRAP_URLS = [scrap1Url, scrap2Url, scrap3Url, scrap1Url, scrap2Url, scrap3Url, scrap1Url, scrap2Url, scrap3Url] as const
 const FOG_COLOR = 0x0a1654
 const NAVY = 0x000b44
 
@@ -18,9 +18,32 @@ const DEPTH_LAYERS = [
   { zMin: -6, zMax: -3, targetSize: 1 },
 ] as const
 
+/* ---------------- COLOR PALETTE FROM FILE 1 ---------------- */
+const SCRAP_COLORS = [
+  0x1425c3,
+  0x596cc1,
+  0x2e39a0,
+  0x2a39c9,
+  0x222fb1,
+  0x2d29aa,
+  0x444eb1,
+  0x383eb0,
+]
+
+function randomScrapColor() {
+  return SCRAP_COLORS[Math.floor(Math.random() * SCRAP_COLORS.length)]
+}
+
 type ScrapInstance = {
   object: THREE.Object3D
   rotSpeed: THREE.Vector3
+}
+
+type StarData = {
+  pos: THREE.Vector3
+  rot: THREE.Vector3
+  rotSpeed: THREE.Vector3
+  speed: number
 }
 
 function randomRange(min: number, max: number) {
@@ -45,18 +68,19 @@ function getCameraBoundsAtZ(camera: THREE.PerspectiveCamera, camZ: number, targe
   }
 }
 
-function createBlueMaterial() {
+/* ---------------- DYNAMIC MATERIAL CREATION ---------------- */
+function createScrapMaterial(colorHex: number) {
   return new THREE.MeshStandardMaterial({
-    color: 0x3a86ff,
+    color: colorHex,
     metalness: 0.4,
     roughness: 0.38,
-    emissive: new THREE.Color(0x1a4db3),
-    emissiveIntensity: 0.35,
+    emissive: new THREE.Color(colorHex),
+    emissiveIntensity: 0.25,
     fog: true,
   })
 }
 
-function applyBlueMaterial(root: THREE.Object3D, material: THREE.MeshStandardMaterial) {
+function applyMaterial(root: THREE.Object3D, material: THREE.Material) {
   root.traverse((child) => {
     if (child instanceof THREE.Mesh) {
       child.material = material
@@ -141,8 +165,23 @@ export function SceneBackground() {
     const depthGroups = [farGroup, midFarGroup, midGroup, midNearGroup, nearGroup]
     scene.add(farGroup, midFarGroup, midGroup, midNearGroup, nearGroup)
 
-    const starCount = 1400
-    const starPos = new Float32Array(starCount * 3)
+    // --- INSTANCED STAR FIELD FIELD SETUP ---
+    const starCount = 1400 
+    const starArray: StarData[] = []
+    
+    const starGeom = new THREE.PlaneGeometry(0.12, 0.12) 
+    const starMat = new THREE.MeshBasicMaterial({
+      color: 0x8b9ccf,
+      transparent: true,
+      opacity: 0.55,
+      depthWrite: false,
+      fog: true,
+      side: THREE.DoubleSide
+    })
+    
+    const starMesh = new THREE.InstancedMesh(starGeom, starMat, starCount)
+    const dummy = new THREE.Object3D()
+
     for (let i = 0; i < starCount; i++) {
       const r = 14 + Math.random() * 16
       const u = Math.random()
@@ -150,21 +189,23 @@ export function SceneBackground() {
       const theta = u * Math.PI * 2
       const phi = Math.acos(2 * v - 1)
       const sinPhi = Math.sin(phi)
-      starPos[i * 3] = r * sinPhi * Math.cos(theta)
-      starPos[i * 3 + 1] = r * sinPhi * Math.sin(theta)
-      starPos[i * 3 + 2] = r * Math.cos(phi) - 22
+
+      const px = r * sinPhi * Math.cos(theta)
+      const py = r * sinPhi * Math.sin(theta)
+      const pz = randomRange(-45, 5)
+
+      starArray.push({
+        pos: new THREE.Vector3(px, py, pz),
+        rot: new THREE.Vector3(randomRange(0, Math.PI), randomRange(0, Math.PI), randomRange(0, Math.PI)),
+        rotSpeed: new THREE.Vector3(
+          randomRange(0.01, 0.04) * (Math.random() > 0.5 ? 1 : -1),
+          randomRange(0.01, 0.04) * (Math.random() > 0.5 ? 1 : -1),
+          randomRange(0.01, 0.04) * (Math.random() > 0.5 ? 1 : -1)
+        ),
+        speed: randomRange(0.01, 0.08)
+      })
     }
-    const starsGeom = new THREE.BufferGeometry()
-    starsGeom.setAttribute('position', new THREE.BufferAttribute(starPos, 3))
-    const starsMat = new THREE.PointsMaterial({
-      color: 0x8b9ccf,
-      size: 0.045,
-      transparent: true,
-      opacity: 0.55,
-      depthWrite: false,
-      fog: true,
-    })
-    farGroup.add(new THREE.Points(starsGeom, starsMat))
+    farGroup.add(starMesh)
 
     scene.add(new THREE.AmbientLight(0xffffff, 0.35))
 
@@ -181,7 +222,6 @@ export function SceneBackground() {
     scene.add(blueFill)
 
     const scrapInstances: ScrapInstance[] = []
-    const blueMaterial = createBlueMaterial()
     const loader = new GLTFLoader()
 
     const loadScrapModels = async () => {
@@ -189,16 +229,13 @@ export function SceneBackground() {
         SCRAP_URLS.map((url) =>
           loader.loadAsync(url).then((gltf) => {
             if (cancelled) return null
-            const root = gltf.scene
-            applyBlueMaterial(root, blueMaterial)
-            return root
+            return gltf.scene
           }),
         ),
       )
 
       if (cancelled) return
 
-      // Ensure dimensions are correct on execution
       const w = container.clientWidth
       const h = Math.max(container.clientHeight, 1)
       camera.aspect = w / h
@@ -212,13 +249,13 @@ export function SceneBackground() {
           const instance = template.clone(true)
           normalizeAndCenter(instance, layer.targetSize)
 
-          // 1. Calculate a random depth within this layer's bounds
-          const randomZ = randomRange(layer.zMin, layer.zMax)
+          // ⭐ RANDOM COLOR PER CLONED SCRAP INSTANCE
+          const uniqueMaterial = createScrapMaterial(randomScrapColor())
+          applyMaterial(instance, uniqueMaterial)
 
-          // 2. Query the dynamically computed maximum visual range at this depth
+          const randomZ = randomRange(layer.zMin, layer.zMax)
           const bounds = getCameraBoundsAtZ(camera, camBase.z, randomZ)
 
-          // 3. Keep X and Y precisely within what the camera frustum sees
           const randomX = randomRange(-bounds.xMax, bounds.xMax)
           const randomY = randomRange(-bounds.yMax, bounds.yMax)
 
@@ -274,7 +311,6 @@ export function SceneBackground() {
       camera.updateProjectionMatrix()
       renderer.setSize(w, h)
 
-      // Mobile check: screen width under 768px OR a touch-capable device
       isMobile = w <= 768 || window.matchMedia('(hover: none) and (pointer: coarse)').matches
     }
 
@@ -290,31 +326,26 @@ export function SceneBackground() {
       time += 0.016
 
       if (isMobile) {
-        // --- MOBILE SINE WAVE ANIMATION ---
+        // --- MOBILE SINE WAVE ANIMATION (PRESERVED) ---
         const mobileAmplitude = 0.6
         const mobileSpeed = 1.0
         const sinValue = Math.sin(time * mobileSpeed)
 
         depthGroups.forEach((group, index) => {
-          // Alternating phase: 0 -> -1, 1 -> 1, 2 -> -1, 3 -> 1, 4 -> -1
           const phaseMult = index % 2 === 0 ? -1 : 1
-          
           group.position.y = sinValue * mobileAmplitude * phaseMult
-          
-          // Smoothly revert X position and rotations back to 0 in case user resized from desktop
           group.position.x = lerp(group.position.x, 0, 0.05)
           group.rotation.x = lerp(group.rotation.x, 0, 0.05)
           group.rotation.y = lerp(group.rotation.y, 0, 0.05)
           group.rotation.z = lerp(group.rotation.z, 0, 0.05)
         })
 
-        // Re-center camera gently
         camera.position.x = lerp(camera.position.x, camBase.x, 0.05)
         camera.position.y = lerp(camera.position.y, camBase.y, 0.05)
         camera.position.z = camBase.z
 
       } else {
-        // --- DESKTOP PARALLAX ANIMATION ---
+        // --- DESKTOP PARALLAX ANIMATION (PRESERVED) ---
         const follow = reduceMotion.matches ? 1 : 0.085
         smoothX = lerp(smoothX, targetX, follow)
         smoothY = lerp(smoothY, targetY, follow)
@@ -348,11 +379,31 @@ export function SceneBackground() {
         camera.position.z = camBase.z
       }
 
-      // Applies to both Mobile and Desktop
       camera.lookAt(0, 0, 0)
       farGroup.rotation.z += 0.00015
 
-      // Constant local rotation for individual scrap pieces
+      // --- INSTANCED STAR UPDATE LOOP (PRESERVED) ---
+      for (let i = 0; i < starCount; i++) {
+        const star = starArray[i]
+        
+        if (!reduceMotion.matches) {
+          star.pos.z += star.speed
+          star.rot.x += star.rotSpeed.x
+          star.rot.y += star.rotSpeed.y
+          star.rot.z += star.rotSpeed.z
+
+          if (star.pos.z > 6) {
+            star.pos.z = randomRange(-55, -35)
+          }
+        }
+
+        dummy.position.copy(star.pos)
+        dummy.rotation.set(star.rot.x, star.rot.y, star.rot.z)
+        dummy.updateMatrix()
+        starMesh.setMatrixAt(i, dummy.matrix)
+      }
+      starMesh.instanceMatrix.needsUpdate = true
+
       for (const { object, rotSpeed } of scrapInstances) {
         object.rotation.x += rotSpeed.x
         object.rotation.y += rotSpeed.y
@@ -371,11 +422,12 @@ export function SceneBackground() {
       window.removeEventListener('pointermove', onMove)
       document.documentElement.removeEventListener('mouseleave', onLeave)
       ro.disconnect()
-      starsGeom.dispose()
-      starsMat.dispose()
-      blueMaterial.dispose()
+      starGeom.dispose()
+      starMat.dispose()
       bottomFogPlane.geometry.dispose()
       ;(bottomFogPlane.material as THREE.ShaderMaterial).dispose()
+      
+      // Cleans up all individual materials uniquely created per scrap slice
       for (const { object } of scrapInstances) {
         object.traverse((child) => {
           if (child instanceof THREE.Mesh) {
