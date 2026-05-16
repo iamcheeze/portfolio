@@ -1,90 +1,9 @@
 import { CardButton } from './CardButton'
 import { NavButton } from './NavButton'
-import aTaleOf2Thumbnail from './assets/ATaleOf2Thumbnail.png'
-import assassinsThumbnail from './assets/AssassinsThumbnail.png'
 import citrusBeatdownThumbnail from './assets/CitrusBeatdownThumbnail.png'
-import mindlockThumbnail from './assets/MindlockThumbnail.png'
-import snowLoopThumbnail from './assets/SnowLoopThumbnail.png'
-import eagleQuestThumbnail from './assets/EagleQuestThumbnail.png'
-import klCartRacingThumbnail from './assets/KLCartRacingThumbnail.png'
 import ARDSThumbnail from './assets/ARDSThumbnail.png'
-import cabezaDeLazoThumbnail from './assets/CabezaDeLazoThumbnail.png'
-import cheezeAndTheChickenNuggetThumbnail from './assets/CheezeAndTheChickenNuggetThumbnail.png'
-import klDarkDescent2Thumbnail from './assets/KLDarkDescent2Thumbnail.png'
-import scalingSomeScalesThumbnail from './assets/ScalingSomeScalesThumbnail.png'
-
-type ExperiencePageProps = {
-  onBack: () => void
-}
-
-const placeholderItems = [
-  {
-    label: 'Project Director',
-    title: 'MINDLOCK MUSEUM',
-    image: mindlockThumbnail,
-    href: 'https://iamcheeze.itch.io/mindlock-museum',
-  },
-  {
-    label: 'Personal Project',
-    title: 'CITRUS BEATDOWN',
-    image: citrusBeatdownThumbnail,
-    href: 'https://iamcheeze.itch.io/citrus-beatdown',
-  },
-  {
-    label: 'Project Director',
-    title: 'ASSASSINS',
-    image: assassinsThumbnail,
-    href: 'https://iamcheeze.itch.io/assassins',
-  },
-  {
-    label: 'Game Jam Entry',
-    title: 'SnowLoop',
-    image: snowLoopThumbnail,
-    href: 'https://iamcheeze.itch.io/snowloop',
-  },
-  {
-    label: 'Project Director',
-    title: 'Eagle Quest',
-    image: eagleQuestThumbnail,
-    href: 'https://ahs-game-development-club.itch.io/eagle-quest',
-  },
-  {
-    label: 'Personal Project',
-    title: 'KL Cart Racing',
-    image: klCartRacingThumbnail,
-    href: 'https://iamcheeze.itch.io/kl-cart-racing',
-  },
-  {
-    label: 'Game Jam Entry',
-    title: '¡Cabeza de Lazo!',
-    image: cabezaDeLazoThumbnail,
-    href: 'https://iamcheeze.itch.io/cabeza-de-lazo',
-  },
-  {
-    label: 'Game Jam Entry',
-    title: 'Scaling Some Scales',
-    image: scalingSomeScalesThumbnail,
-    href: 'https://iamcheeze.itch.io/scaling-some-scales',
-  },
-  {
-    label: 'Personal Project',
-    title: 'Cheeze and the Chicken Nugget',
-    image: cheezeAndTheChickenNuggetThumbnail,
-    href: 'https://iamcheeze.itch.io/cheeze-and-the-chicken-nugget',
-  },
-  {
-    label: 'Game Jam Entry',
-    title: 'A Tale of 2',
-    image: aTaleOf2Thumbnail,
-    href: 'https://iamcheeze.itch.io/a-tale-of-2',
-  },
-  {
-    label: 'Personal Project',
-    title: 'KL: The Dark Descent 2',
-    image: klDarkDescent2Thumbnail,
-    href: 'https://iamcheeze.itch.io/kl-the-dark-descent-2',
-  },
-]
+import mindlockThumbnail from './assets/MindlockThumbnail.png'
+import { projectItems } from './projectItems'
 
 const categoryItems = [
   {
@@ -101,8 +20,13 @@ const categoryItems = [
   },
 ]
 
-export function ExperiencePage({ onBack }: ExperiencePageProps) {
-  const scrollingItems = [...placeholderItems, ...placeholderItems]
+type ExperiencePageProps = {
+  onBack: () => void
+  onCatalog: () => void
+}
+
+export function ExperiencePage({ onBack, onCatalog }: ExperiencePageProps) {
+  const scrollingItems = [...projectItems, ...projectItems]
 
   return (
     <main className="experience-page" aria-labelledby="experience-title">
@@ -114,13 +38,21 @@ export function ExperiencePage({ onBack }: ExperiencePageProps) {
             EXPERIENCE
           </h1>
         </header>
-        <nav className="nav-panel" aria-label="Experience navigation">
-          <NavButton onClick={onBack}>CATALOG SEARCH</NavButton>
-        </nav>
+        <nav className="nav-panel" aria-label="Experience navigation" style={{ display: 'block', padding: '1.5rem' }}>
+  <p style={{ margin: 0, fontSize: 'clamp(0.85rem, 1.8vw, 1.2rem)', color: 'var(--yellow)', lineHeight: '1.5' }}>
+    USE THE{' '}
+    <span style={{ display: 'inline-block', margin: '0 0.5rem', verticalAlign: 'middle' }}>
+      <NavButton onClick={onCatalog} href="#/catalog">
+        CATALOG SEARCH
+      </NavButton>
+    </span>
+    TO SEARCH THROUGH ALL MY PROJECTS!
+  </p>
+</nav>
         <div className="experience-marquee" aria-label="Experience image placeholders">
           <div className="experience-track">
             {scrollingItems.map((item, index) => {
-              const isDuplicate = index >= placeholderItems.length
+              const isDuplicate = index >= projectItems.length
 
               return (
                 <CardButton

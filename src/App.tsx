@@ -1,18 +1,41 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { CatalogPage } from './CatalogPage'
 import { ExperiencePage } from './ExperiencePage'
 import { NavButton } from './NavButton'
 import { SceneBackground } from './SceneBackground'
 import { TaglineMarquee } from './TaglineMarquee'
+import instagramIcon from './assets/instagramIcon.svg'
+import itchIcon from './assets/itchIcon.svg'
+import linkedinIcon from './assets/linkedinIcon.svg'
 import './App.css'
 
-type Page = 'home' | 'experience'
+type Page = 'home' | 'experience' | 'catalog'
 
 const TRANSITION_MS = 420
+
+const socialLinks = [
+  {
+    label: 'Instagram',
+    href: 'https://www.instagram.com/iamrayanghosh/',
+    icon: instagramIcon,
+  },
+  {
+    label: 'LinkedIn',
+    href: 'https://www.linkedin.com/in/rayan-ghosh-830a04386/',
+    icon: linkedinIcon,
+  },
+  {
+    label: 'Itch',
+    href: 'https://iamcheeze.itch.io/',
+    icon: itchIcon,
+  },
+]
 
 /** * Detection logic: GitHub Pages friendly hash check 
  */
 function getPageFromPath(): Page {
   const hash = window.location.hash
+  if (hash === '#/catalog') return 'catalog'
   return hash === '#/experience' ? 'experience' : 'home'
 }
 
@@ -31,7 +54,7 @@ function App() {
       
       if (pushHistory) {
         // Set hash instead of pushState to prevent 404s on refresh
-        const nextHash = nextPage === 'experience' ? '#/experience' : '#/'
+        const nextHash = nextPage === 'catalog' ? '#/catalog' : nextPage === 'experience' ? '#/experience' : '#/'
         window.location.hash = nextHash
       }
 
@@ -127,9 +150,26 @@ function App() {
               <NavButton href="#about">WHO AM I?</NavButton>
               <NavButton href="#contact">CONTACT</NavButton>
             </nav>
+
+            <nav className="social-panel fade-in-social" aria-label="Social media">
+              {socialLinks.map((item) => (
+                <a
+                  className="social-btn"
+                  href={item.href}
+                  key={item.label}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={item.label}
+                >
+                  <img src={item.icon} alt="" />
+                </a>
+              ))}
+            </nav>
           </main>
+        ) : page === 'experience' ? (
+          <ExperiencePage onBack={() => transitionTo('home')} onCatalog={() => transitionTo('catalog')} />
         ) : (
-          <ExperiencePage onBack={() => transitionTo('home')} />
+          <CatalogPage onBack={() => transitionTo('experience')} />
         )}
       </div>
     </div>
