@@ -40,15 +40,27 @@ export function ExperiencePage({ onBack, onCatalog }: ExperiencePageProps) {
         </header>
         <nav className="nav-panel" aria-label="Experience navigation" style={{ display: 'block', padding: '1.5rem' }}>
   <p style={{ margin: 0, fontSize: 'clamp(0.85rem, 1.8vw, 1.2rem)', color: 'var(--yellow)', lineHeight: '1.5' }}>
-    USE THE{' '}
+    USE THE{' '}<br /><br />
     <span style={{ display: 'inline-block', margin: '0 0.5rem', verticalAlign: 'middle' }}>
       <NavButton onClick={onCatalog} href="#/catalog">
         CATALOG SEARCH
       </NavButton>
     </span>
+    <br />
+    <br />
     TO SEARCH THROUGH ALL MY PROJECTS!
   </p>
 </nav>
+        <nav className="experience-category-grid" aria-label="Experience categories">
+          {categoryItems.map((item) => (
+            <button className="experience-category-card" key={item.title} type="button">
+              <span className="experience-category-image">
+                <img src={item.image} alt="" />
+              </span>
+              <span className="experience-category-title">{item.title}</span>
+            </button>
+          ))}
+        </nav>
         <div className="experience-marquee" aria-label="Experience image placeholders">
           <div className="experience-track">
             {scrollingItems.map((item, index) => {
@@ -68,17 +80,6 @@ export function ExperiencePage({ onBack, onCatalog }: ExperiencePageProps) {
             })}
           </div>
         </div>
-
-        <nav className="experience-category-grid" aria-label="Experience categories">
-          {categoryItems.map((item) => (
-            <button className="experience-category-card" key={item.title} type="button">
-              <span className="experience-category-image">
-                <img src={item.image} alt="" />
-              </span>
-              <span className="experience-category-title">{item.title}</span>
-            </button>
-          ))}
-        </nav>
         <nav className="nav-panel experience-nav" aria-label="Experience navigation">
           <NavButton onClick={onBack}>BACK</NavButton>
         </nav>
