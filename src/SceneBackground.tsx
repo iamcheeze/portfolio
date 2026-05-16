@@ -7,6 +7,7 @@ import scrap3Url from './assets/Scrap3.glb?url'
 import './SceneBackground.css'
 
 const SCRAP_URLS = [scrap1Url, scrap2Url, scrap3Url, scrap1Url, scrap2Url, scrap3Url, scrap1Url, scrap2Url, scrap3Url] as const
+const SCRAP_URLS_MOBILE = [scrap1Url, scrap2Url, scrap3Url] as const
 const FOG_COLOR = 0x0a1654
 const NAVY = 0x000b44
 
@@ -225,8 +226,15 @@ export function SceneBackground() {
     const loader = new GLTFLoader()
 
     const loadScrapModels = async () => {
+      // 📱 CHECK DEVICE TYPE IMMEDIATELY BEFORE REQUESTING ASSETS
+      const currentWidth = container.clientWidth
+      const isMobileDevice = currentWidth <= 768 || window.matchMedia('(hover: none) and (pointer: coarse)').matches
+      
+      // Select the optimal array based on mobile status
+      const urlsToLoad = isMobileDevice ? SCRAP_URLS_MOBILE : SCRAP_URLS
+
       const templates = await Promise.all(
-        SCRAP_URLS.map((url) =>
+        urlsToLoad.map((url) =>
           loader.loadAsync(url).then((gltf) => {
             if (cancelled) return null
             return gltf.scene
@@ -249,7 +257,7 @@ export function SceneBackground() {
           const instance = template.clone(true)
           normalizeAndCenter(instance, layer.targetSize)
 
-          // ⭐ RANDOM COLOR PER CLONED SCRAP INSTANCE
+          // 🎨 RANDOM COLOR VARIATION PER CLONED INSTANCE SLYCE
           const uniqueMaterial = createScrapMaterial(randomScrapColor())
           applyMaterial(instance, uniqueMaterial)
 
@@ -427,7 +435,7 @@ export function SceneBackground() {
       bottomFogPlane.geometry.dispose()
       ;(bottomFogPlane.material as THREE.ShaderMaterial).dispose()
       
-      // Cleans up all individual materials uniquely created per scrap slice
+      // Deep garbage collection for dynamically assigned color materials
       for (const { object } of scrapInstances) {
         object.traverse((child) => {
           if (child instanceof THREE.Mesh) {
