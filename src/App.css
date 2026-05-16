@@ -155,7 +155,7 @@
   will-change: transform;
 
   /* Frosted Glass Base */
-  background: var(--panel-bg);
+  background: rgba(45, 41, 170, 0.1);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
   border: 1px solid var(--panel-border);
@@ -204,7 +204,7 @@
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease;
 
   /* Glass Button Face */
-  background: #444eb1;
+  background: rgba(68, 78, 177, 0.25);
   border: 1px solid #5a6dc2;
   box-shadow: inset 0 1px 0px rgba(255, 255, 255, 0.3);
 }
@@ -212,7 +212,7 @@
 .nav-btn:hover .nav-btn-face,
 .nav-btn:focus-visible .nav-btn-face {
   transform: translateY(calc(-1 * var(--btn-lift)));
-  background: rgba(68, 78, 177, 0.25);
+  background: rgba(68, 78, 177, 0.6);
   border-color: rgba(90, 109, 194, 0.4);
 }
 
