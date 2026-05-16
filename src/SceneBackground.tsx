@@ -7,7 +7,7 @@ import scrap3Url from './assets/Scrap3.glb?url'
 import './SceneBackground.css'
 
 const SCRAP_URLS = [scrap1Url, scrap2Url, scrap3Url, scrap1Url, scrap2Url, scrap3Url, scrap1Url, scrap2Url, scrap3Url] as const
-const SCRAP_URLS_MOBILE = [scrap1Url, scrap2Url, scrap3Url] as const
+const SCRAP_URLS_MOBILE = [scrap1Url, scrap2Url, scrap3Url, scrap1Url, scrap2Url, scrap3Url] as const
 const FOG_COLOR = 0x0a1654
 const NAVY = 0x000b44
 
