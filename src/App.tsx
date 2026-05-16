@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CatalogPage } from './CatalogPage'
 import { ExperiencePage } from './ExperiencePage'
+import { AboutPage } from './AboutPage'
+import { ContactPage } from './ContactPage'
 import { NavButton } from './NavButton'
 import { SceneBackground } from './SceneBackground'
 import { TaglineMarquee } from './TaglineMarquee'
@@ -9,7 +11,7 @@ import itchIcon from './assets/itchIcon.svg'
 import linkedinIcon from './assets/linkedinIcon.svg'
 import './App.css'
 
-type Page = 'home' | 'experience' | 'catalog'
+type Page = 'home' | 'experience' | 'catalog' | 'about' | 'contact'
 
 const TRANSITION_MS = 420
 
@@ -35,8 +37,19 @@ const socialLinks = [
  */
 function getPageFromPath(): Page {
   const hash = window.location.hash
-  if (hash === '#/catalog') return 'catalog'
-  return hash === '#/experience' ? 'experience' : 'home'
+
+  switch (hash) {
+    case '#/catalog':
+      return 'catalog'
+    case '#/experience':
+      return 'experience'
+    case '#/about':
+      return 'about'
+    case '#/contact':
+      return 'contact'
+    default:
+      return 'home'
+  }
 }
 
 function App() {
@@ -52,11 +65,11 @@ function App() {
     window.setTimeout(() => {
       setPage(nextPage)
       
-      if (pushHistory) {
-        // Set hash instead of pushState to prevent 404s on refresh
-        const nextHash = nextPage === 'catalog' ? '#/catalog' : nextPage === 'experience' ? '#/experience' : '#/'
-        window.location.hash = nextHash
-      }
+    if (pushHistory) {
+      // Set hash instead of pushState to prevent 404s on refresh
+      const nextHash = nextPage === 'catalog' ? '#/catalog' : nextPage === 'experience' ? '#/experience' : nextPage === 'about' ? '#/contact' : nextPage === 'contact' ? '#/contact' : '#/'
+      window.location.hash = nextHash
+    }
 
       window.setTimeout(() => {
         setIsTransitioning(false)
@@ -147,8 +160,17 @@ function App() {
               >
                 EXPERIENCE
               </NavButton>
-              <NavButton href="#about">WHO AM I?</NavButton>
-              <NavButton href="#contact">CONTACT</NavButton>
+              <NavButton
+                onClick={() => transitionTo('about')} 
+                href="#/about"
+              >
+                WHO AM I?
+              </NavButton>
+              <NavButton onClick={() => transitionTo('contact')} 
+                href="#/contact"
+              >
+                CONTACT
+              </NavButton>
             </nav>
 
             <nav className="social-panel fade-in-social" aria-label="Social media">
@@ -168,6 +190,10 @@ function App() {
           </main>
         ) : page === 'experience' ? (
           <ExperiencePage onBack={() => transitionTo('home')} onCatalog={() => transitionTo('catalog')} />
+        ) : page === 'about' ? (
+          <AboutPage onBack={() => transitionTo('home')} />
+        ) : page === 'contact' ? (
+          <ContactPage onBack={() => transitionTo('home')} />
         ) : (
           <CatalogPage onBack={() => transitionTo('experience')} />
         )}
