@@ -3,9 +3,10 @@ import type { ReactNode } from 'react'
 type NavButtonProps = {
   children: ReactNode
   href?: string
+  onClick?: () => void
 }
 
-export function NavButton({ children, href }: NavButtonProps) {
+export function NavButton({ children, href, onClick }: NavButtonProps) {
   if (href) {
     return (
       <a className="nav-btn" href={href}>
@@ -15,7 +16,7 @@ export function NavButton({ children, href }: NavButtonProps) {
   }
 
   return (
-    <button type="button" className="nav-btn">
+    <button type="button" className="nav-btn" onClick={onClick}>
       <span className="nav-btn-face">{children}</span>
     </button>
   )
