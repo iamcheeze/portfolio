@@ -10,8 +10,6 @@ import klCartRacingThumbnail from './assets/KLCartRacingThumbnail.png'
 import ARDSThumbnail from './assets/ARDSThumbnail.png'
 import cabezaDeLazoThumbnail from './assets/CabezaDeLazoThumbnail.png'
 import cheezeAndTheChickenNuggetThumbnail from './assets/CheezeAndTheChickenNuggetThumbnail.png'
-import diceheadThumbnail from './assets/DiceheadThumbnail.png'
-import findThePepperThumbnail from './assets/FindThePepper.png'
 import klDarkDescent2Thumbnail from './assets/KLDarkDescent2Thumbnail.png'
 import scalingSomeScalesThumbnail from './assets/ScalingSomeScalesThumbnail.png'
 
