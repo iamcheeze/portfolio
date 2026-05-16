@@ -157,7 +157,7 @@
 .hero-tagline-track {
   display: flex;
   width: max-content;
-  animation: tagline-scroll 45s linear infinite;
+  animation: tagline-scroll 90s linear infinite;
 }
 
 .hero-tagline-chunk {
@@ -566,7 +566,7 @@
   position: relative;
   overflow: hidden;
   display: block;
-  aspect-ratio: 16 / 7;
+  aspect-ratio: 4 / 3;
   border: 1px solid rgba(90, 109, 194, 0.5);
   border-radius: 10px;
   background:

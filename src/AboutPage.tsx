@@ -17,7 +17,7 @@ export function AboutPage({ onBack }: AboutPageDrops) {
         </header>
 <nav className="nav-panel" aria-label="Experience navigation" style={{ display: 'block', padding: '1.5rem' }}>
   <p style={{ margin: 0, fontSize: 'clamp(0.85rem, 1.8vw, 1.2rem)', color: 'var(--yellow)', lineHeight: '1.5' }}>
-    Read about me here wow!
+    Work In Progress!
   </p>
 </nav>
     <nav className="nav-panel experience-nav" aria-label="Experience navigation">

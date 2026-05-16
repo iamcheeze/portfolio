@@ -4,6 +4,7 @@ import { ExperiencePage } from './ExperiencePage'
 import { AboutPage } from './AboutPage'
 import { ContactPage } from './ContactPage'
 import { NavButton } from './NavButton'
+import { ExternalLinkButton } from './ExternalLinkButton'
 import { SceneBackground } from './SceneBackground'
 import { TaglineMarquee } from './TaglineMarquee'
 import instagramIcon from './assets/instagramIcon.svg'
@@ -166,11 +167,9 @@ function App() {
               >
                 WHO AM I?
               </NavButton>
-              <NavButton onClick={() => transitionTo('contact')} 
-                href="#/contact"
-              >
-                CONTACT
-              </NavButton>
+              <ExternalLinkButton href="https://drive.google.com/file/d/1XjYry0P2eFwgLl42o_59LYiaFuc3QeTJ/view">
+                RESUME (PDF)
+              </ExternalLinkButton>
             </nav>
 
             <nav className="social-panel fade-in-social" aria-label="Social media">

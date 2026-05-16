@@ -38,19 +38,6 @@ export function ExperiencePage({ onBack, onCatalog }: ExperiencePageProps) {
             EXPERIENCE
           </h1>
         </header>
-        <nav className="nav-panel" aria-label="Experience navigation" style={{ display: 'block', padding: '1.5rem' }}>
-  <p style={{ margin: 0, fontSize: 'clamp(0.85rem, 1.8vw, 1.2rem)', color: 'var(--yellow)', lineHeight: '1.5' }}>
-    USE THE{' '}<br /><br />
-    <span style={{ display: 'inline-block', margin: '0 0.5rem', verticalAlign: 'middle' }}>
-      <NavButton onClick={onCatalog} href="#/catalog">
-        CATALOG SEARCH
-      </NavButton>
-    </span>
-    <br />
-    <br />
-    TO SEARCH THROUGH ALL MY PROJECTS!
-  </p>
-</nav>
         <nav className="experience-category-grid" aria-label="Experience categories">
           {categoryItems.map((item) => (
             <button className="experience-category-card" key={item.title} type="button">
@@ -80,6 +67,16 @@ export function ExperiencePage({ onBack, onCatalog }: ExperiencePageProps) {
             })}
           </div>
         </div>
+                <nav className="nav-panel" aria-label="Experience navigation" style={{ display: 'block', padding: '1.5rem' }}>
+  <p style={{ margin: 0, fontSize: 'clamp(0.85rem, 1.8vw, 1.2rem)', color: 'var(--yellow)', lineHeight: '1.5' }}>
+    USE THE CATALOG SEARCH TO BROWSE MY ENTIRE PROJECT ARCHIVE!{' '}<br /><br />
+    <span style={{ display: 'inline-block', margin: '0 0.5rem', verticalAlign: 'middle' }}>
+      <NavButton onClick={onCatalog} href="#/catalog">
+        CATALOG SEARCH
+      </NavButton>
+    </span>
+  </p>
+</nav>
         <nav className="nav-panel experience-nav" aria-label="Experience navigation">
           <NavButton onClick={onBack}>BACK</NavButton>
         </nav>
