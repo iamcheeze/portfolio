@@ -1,4 +1,5 @@
 import { NavButton } from './NavButton'
+import { ExternalLinkButton } from './ExternalLinkButton'
 
 type ContactPageDrops = {
   onBack: () => void
@@ -18,7 +19,10 @@ export function ContactPage({ onBack }: ContactPageDrops) {
 <nav className="nav-panel" aria-label="Experience navigation" style={{ display: 'block', padding: '1.5rem' }}>
   <p style={{ margin: 0, fontSize: 'clamp(0.85rem, 1.8vw, 1.2rem)', color: 'var(--yellow)', lineHeight: '1.5' }}>
     CONTACT ME HERE NOW!
-  </p>
+  </p> <br></br>
+  <ExternalLinkButton href="https://drive.google.com/file/d/1XjYry0P2eFwgLl42o_59LYiaFuc3QeTJ/view">
+    RESUME (PDF)
+  </ExternalLinkButton>
 </nav>
     <nav className="nav-panel experience-nav" aria-label="Experience navigation">
         <NavButton onClick={onBack}>BACK</NavButton>

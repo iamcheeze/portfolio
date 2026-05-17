@@ -167,9 +167,12 @@ function App() {
               >
                 WHO AM I?
               </NavButton>
-              <ExternalLinkButton href="https://drive.google.com/file/d/1XjYry0P2eFwgLl42o_59LYiaFuc3QeTJ/view">
-                RESUME (PDF)
-              </ExternalLinkButton>
+              <NavButton
+                onClick={() => transitionTo('contact')} 
+                href="#/about"
+              >
+                CONTACT
+              </NavButton>
             </nav>
 
             <nav className="social-panel fade-in-social" aria-label="Social media">

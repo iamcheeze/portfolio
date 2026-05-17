@@ -35,7 +35,7 @@ export function ExperiencePage({ onBack, onCatalog }: ExperiencePageProps) {
       <section className="experience-shell">
         <header className="experience-header">
           <h1 id="experience-title" className="experience-title">
-            EXPERIENCE
+            MY EXPERIENCE
           </h1>
         </header>
         <nav className="experience-category-grid" aria-label="Experience categories">
