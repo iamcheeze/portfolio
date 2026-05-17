@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react'
 import { CardButton } from './CardButton'
 import { NavButton } from './NavButton'
 import citrusBeatdownThumbnail from './assets/CitrusBeatdownThumbnail.png'
 import ARDSThumbnail from './assets/ARDSThumbnail.png'
 import mindlockThumbnail from './assets/MindlockThumbnail.png'
+import JumpPromoImage1 from './assets/JumpPromoImage1.png'
 import { projectItems } from './projectItems'
 
 const categoryItems = [
@@ -20,6 +22,27 @@ const categoryItems = [
   },
 ]
 
+const highlightsData = [
+  {
+    title: 'ACUTE RESPIRATORY DISTRESS SIMULATION',
+    description: 'I CREATED AN IMMERSIVE VITALS MONITOR AND VENTILATION SYSTEM FOR OUR VIRTUAL PATIENT, WHICH WE THEN VALIDATED THROUGH USER TESTING AND FEEDBACK WITH 65 M1 MEDICAL STUDENTS!',
+    subtitle: 'JUMP SIMULATION CENTER',
+    image: JumpPromoImage1,
+  },
+  {
+    title: 'CITRUS BEATDOWN',
+    description: 'A FAST-PACED 2D PLATFORMER FEATURING UNIQUE MECHANICS AND CHALLENGING LEVELS. BUILT WITH UNITY AND C#.',
+    subtitle: 'PERSONAL PROJECT',
+    image: JumpPromoImage1,
+  },
+  {
+    title: 'MINDLOCK',
+    description: 'AN IMMERSIVE PUZZLE GAME THAT CHALLENGES PLAYERS WITH INTRICATE MECHANICS AND STUNNING VISUALS.',
+    subtitle: 'LEADERSHIP EXPERIENCE',
+    image: JumpPromoImage1,
+  },
+]
+
 type ExperiencePageProps = {
   onBack: () => void
   onCatalog: () => void
@@ -27,6 +50,27 @@ type ExperiencePageProps = {
 
 export function ExperiencePage({ onBack, onCatalog }: ExperiencePageProps) {
   const scrollingItems = [...projectItems, ...projectItems]
+  const [currentHighlight, setCurrentHighlight] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentHighlight((prev) => (prev + 1) % highlightsData.length)
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [])
+
+  const nextHighlight = () => {
+    setCurrentHighlight((prev) => (prev + 1) % highlightsData.length)
+  }
+
+  const goToHighlight = (index: number) => {
+    setCurrentHighlight(index)
+  }
+
+  const handleHighlightClick = () => {
+    onBack()
+  }
 
   return (
     <main className="experience-page" aria-labelledby="experience-title">
@@ -38,6 +82,46 @@ export function ExperiencePage({ onBack, onCatalog }: ExperiencePageProps) {
             MY EXPERIENCE
           </h1>
         </header>
+
+        <div className="highlights-carousel">
+          <div className="highlights-track">
+            {highlightsData.map((highlight, index) => (
+              <div
+                key={index}
+                className={`highlight-card ${index === currentHighlight ? 'active' : ''}`}
+                onClick={handleHighlightClick}
+              >
+                <div className="highlight-image">
+                  <img src={highlight.image} alt="" />
+                </div>
+                <div className="highlight-content">
+                  <h2 className="highlight-title">{highlight.title}</h2>
+                  <span className="highlight-subtitle">{highlight.subtitle}</span>
+                  <p className="highlight-description">{highlight.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button
+            className="highlight-nav-button"
+            onClick={nextHighlight}
+            aria-label="Next highlight"
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
+          <div className="highlights-dots">
+            {highlightsData.map((_, index) => (
+              <button
+                key={index}
+                className={`highlight-dot ${index === currentHighlight ? 'active' : ''}`}
+                onClick={() => goToHighlight(index)}
+                aria-label={`Go to highlight ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
         <nav className="experience-category-grid" aria-label="Experience categories">
           {categoryItems.map((item) => (
             <button className="experience-category-card" key={item.title} type="button">
