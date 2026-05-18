@@ -930,16 +930,20 @@
   }
 
   .catalog-grid {
-    grid-template-columns: repeat(3, 1fr);
+    display: grid;
+    /* FIX: Automatically calculates how many cards fit safely without squishing */
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 8.5rem), 1fr));
     width: 100%;
-    gap: clamp(0.5rem, 1.5vw, 0.75rem);
-    padding: 0 clamp(0.5rem, 1.5vw, 0.75rem) 0.5rem;
+    gap: 0.5rem;
+    padding: 0 0.75rem 0.5rem;
+    box-sizing: border-box; /* Force padding inside the 100% width math */
   }
 
   .catalog-grid .card-button {
     width: 100%;
-    min-height: clamp(12rem, 35vw, 15rem);
-    padding: clamp(0.6rem, 1.8vw, 0.9rem);
+    /* Keep min-height responsive but clean */
+    min-height: clamp(11rem, 35vw, 15rem);
+    padding: 0.65rem;
   }
 
   .card-button p {
