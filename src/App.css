@@ -274,7 +274,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(0.45rem, 1.4vw, 0.7amp);
+  gap: clamp(0.45rem, 1.4vw, 0.7rem); /* FIX: Changed 0.7amp to 0.7rem */
   width: fit-content;
   padding: 0.55rem;
   border: 1px solid var(--panel-border);

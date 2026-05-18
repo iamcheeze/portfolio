@@ -7,6 +7,7 @@ import { NavButton } from './NavButton'
 import { SceneBackground } from './SceneBackground'
 import { TaglineMarquee } from './TaglineMarquee'
 import instagramIcon from './assets/instagramIcon.svg'
+import youtubeIcon from './assets/youtube.svg'
 import itchIcon from './assets/itchIcon.svg'
 import linkedinIcon from './assets/linkedinIcon.svg'
 import './App.css'
@@ -16,6 +17,11 @@ type Page = 'home' | 'experience' | 'catalog' | 'about' | 'contact'
 const TRANSITION_MS = 420
 
 const socialLinks = [
+  {
+    label: 'Youtube',
+    href: 'https://www.youtube.com/@iamcheezeYT',
+    icon: youtubeIcon,
+  },
   {
     label: 'Instagram',
     href: 'https://www.instagram.com/iamrayanghosh/',
