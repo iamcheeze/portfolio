@@ -1,4 +1,5 @@
 import aTaleOf2Thumbnail from './assets/ATaleOf2Thumbnail.png'
+import redThumbnail from './assets/RedThumbnail.jpg'
 import assassinsThumbnail from './assets/AssassinsThumbnail.png'
 import backThroughTimeThumbnail from './assets/BackThroughTimeThumbnail.png'
 import cabezaDeLazoThumbnail from './assets/CabezaDeLazoThumbnail.png'
@@ -62,6 +63,13 @@ export const projectItems: ProjectItem[] = [
     title: 'CITRUS BEATDOWN',
     image: citrusBeatdownThumbnail,
     href: 'https://iamcheeze.itch.io/citrus-beatdown',
+    tag: 'Personal Project',
+  },
+  {
+    label: 'Personal Project',
+    title: 'PAINT THE WORLD RED',
+    image: redThumbnail,
+    href: 'https://www.instagram.com/ptwredgame/',
     tag: 'Personal Project',
   },
   {
