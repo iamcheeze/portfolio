@@ -3,9 +3,11 @@ import { CatalogPage } from './CatalogPage'
 import { ExperiencePage } from './ExperiencePage'
 import { AboutPage } from './AboutPage'
 import { ContactPage } from './ContactPage'
+import { HomeTrackCard } from './HomeTrackCard'
 import { NavButton } from './NavButton'
 import { SceneBackground } from './SceneBackground'
 import { TaglineMarquee } from './TaglineMarquee'
+import { scrollingTrackProjectItems } from './projectItems'
 import instagramIcon from './assets/instagramIcon.svg'
 import youtubeIcon from './assets/youtube.svg'
 import itchIcon from './assets/itchIcon.svg'
@@ -62,6 +64,7 @@ function App() {
   const appRef = useRef<HTMLDivElement>(null)
   const [page, setPage] = useState<Page>(() => getPageFromPath())
   const [isTransitioning, setIsTransitioning] = useState(false)
+  const homeTrackItems = [...scrollingTrackProjectItems, ...scrollingTrackProjectItems]
 
   const transitionTo = useCallback((nextPage: Page, pushHistory = true) => {
     if (nextPage === page || isTransitioning) return
@@ -149,51 +152,90 @@ function App() {
       <div className={`page-transition ${isTransitioning ? 'is-leaving' : 'is-entering'}`}>
         {page === 'home' ? (
           <main className="hero">
-            <div className="hero-glow" aria-hidden="true" />
+            <div className="hero-marquee hero-marquee--top" aria-label="Featured projects, scrolling top row">
+              <div className="hero-track hero-track--rtl">
+                {homeTrackItems.map((item, index) => {
+                  const isDuplicate = index >= scrollingTrackProjectItems.length
 
-            <header className="hero-copy">
-              <h1 className="hero-title fade-in-header">RAYAN GHOSH</h1>
-              <div className="fade-in-tagline">
-                <TaglineMarquee />
+                  return (
+                    <HomeTrackCard
+                      key={`top-${item.title}-${index}`}
+                      href={item.href}
+                      image={item.image}
+                      title={item.title}
+                      ariaHidden={isDuplicate}
+                      tabIndex={isDuplicate ? -1 : 0}
+                    />
+                  )
+                })}
               </div>
-            </header>
+            </div>
 
-            <nav className="nav-panel fade-in-nav" aria-label="Main">
-              {/* Added fallback href for SEO and middle-click support */}
-              <NavButton 
-                onClick={() => transitionTo('experience')} 
-                href="#/experience"
-              >
-                EXPERIENCE
-              </NavButton>
-              <NavButton
-                onClick={() => transitionTo('about')} 
-                href="#/about"
-              >
-                WHO AM I?
-              </NavButton>
-              <NavButton
-                onClick={() => transitionTo('contact')} 
-                href="#/about"
-              >
-                CONTACT
-              </NavButton>
-            </nav>
+            <div className="hero-core">
+              <div className="hero-glow" aria-hidden="true" />
 
-            <nav className="social-panel fade-in-social" aria-label="Social media">
-              {socialLinks.map((item) => (
-                <a
-                  className="social-btn"
-                  href={item.href}
-                  key={item.label}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label={item.label}
+              <header className="hero-copy">
+                <h1 className="hero-title fade-in-header">RAYAN GHOSH</h1>
+                <div className="fade-in-tagline">
+                  <TaglineMarquee />
+                </div>
+              </header>
+
+              <nav className="nav-panel fade-in-nav" aria-label="Main">
+                <NavButton
+                  onClick={() => transitionTo('experience')}
+                  href="#/experience"
                 >
-                  <img src={item.icon} alt="" />
-                </a>
-              ))}
-            </nav>
+                  EXPERIENCE
+                </NavButton>
+                <NavButton
+                  onClick={() => transitionTo('about')}
+                  href="#/about"
+                >
+                  WHO AM I?
+                </NavButton>
+                <NavButton
+                  onClick={() => transitionTo('contact')}
+                  href="#/about"
+                >
+                  CONTACT
+                </NavButton>
+              </nav>
+
+              <nav className="social-panel fade-in-social" aria-label="Social media">
+                {socialLinks.map((item) => (
+                  <a
+                    className="social-btn"
+                    href={item.href}
+                    key={item.label}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={item.label}
+                  >
+                    <img src={item.icon} alt="" />
+                  </a>
+                ))}
+              </nav>
+            </div>
+
+            <div className="hero-marquee hero-marquee--bottom" aria-label="Featured projects, scrolling bottom row">
+              <div className="hero-track hero-track--ltr">
+                {homeTrackItems.map((item, index) => {
+                  const isDuplicate = index >= scrollingTrackProjectItems.length
+
+                  return (
+                    <HomeTrackCard
+                      key={`bottom-${item.title}-${index}`}
+                      href={item.href}
+                      image={item.image}
+                      title={item.title}
+                      ariaHidden={isDuplicate}
+                      tabIndex={isDuplicate ? -1 : 0}
+                    />
+                  )
+                })}
+              </div>
+            </div>
           </main>
         ) : page === 'experience' ? (
           <ExperiencePage onBack={() => transitionTo('home')} onCatalog={() => transitionTo('catalog')} />

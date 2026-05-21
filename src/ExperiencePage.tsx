@@ -7,19 +7,22 @@ import mindlockThumbnail from './assets/MindlockThumbnail.png'
 import JumpPromoImage1 from './assets/JumpPromoImage1.png'
 import MindlockMuseumPromoImage2 from './assets/MindlockMuseum2.png'
 import RedHighlight1 from './assets/RedHighlight.jpg'
-import { projectItems } from './projectItems'
+import { scrollingTrackProjectItems } from './projectItems'
 
 const categoryItems = [
   {
     title: 'PERSONAL PROJECTS',
+    mobileTitle: 'Personal Projects ✨',
     image: citrusBeatdownThumbnail,
   },
   {
     title: 'PROFESSIONAL EXPERIENCE',
+    mobileTitle: 'Professional Experience 🎯',
     image: ARDSThumbnail,
   },
   {
     title: 'LEADERSHIP EXPERIENCE',
+    mobileTitle: 'Leadership Experience 🚀',
     image: mindlockThumbnail,
   },
 ]
@@ -51,7 +54,7 @@ type ExperiencePageProps = {
 }
 
 export function ExperiencePage({ onBack, onCatalog }: ExperiencePageProps) {
-  const scrollingItems = [...projectItems, ...projectItems]
+  const scrollingItems = [...scrollingTrackProjectItems, ...scrollingTrackProjectItems]
   const [currentHighlight, setCurrentHighlight] = useState(0)
 
   useEffect(() => {
@@ -134,18 +137,30 @@ export function ExperiencePage({ onBack, onCatalog }: ExperiencePageProps) {
         <nav className="experience-category-grid" aria-label="Experience categories">
           {categoryItems.map((item) => (
             <button className="experience-category-card" key={item.title} type="button">
-              <span className="experience-category-image">
+              <span className="experience-category-image experience-category-desktop-only">
                 <img src={item.image} alt="" />
               </span>
-              <span className="experience-category-title">{item.title}</span>
+              <span className="experience-category-title experience-category-desktop-only">{item.title}</span>
+              <span className="experience-category-title experience-category-mobile-only">{item.mobileTitle}</span>
             </button>
           ))}
+        </nav>
+
+        <nav className="nav-panel" aria-label="Experience navigation" style={{ display: 'block', padding: '1.5rem' }}>
+          <p style={{ margin: 0, fontSize: 'clamp(0.85rem, 1.8vw, 1.2rem)', color: 'var(--yellow)', lineHeight: '1.5' }}>
+            USE THE CATALOG SEARCH TO BROWSE MY ENTIRE PROJECT ARCHIVE!{' '}<br /><br />
+            <span style={{ display: 'inline-block', margin: '0 0.5rem', verticalAlign: 'middle' }}>
+              <NavButton onClick={onCatalog} href="#/catalog">
+                CATALOG SEARCH
+              </NavButton>
+            </span>
+          </p>
         </nav>
 
         <div className="experience-marquee" aria-label="Experience image placeholders">
           <div className="experience-track">
             {scrollingItems.map((item, index) => {
-              const isDuplicate = index >= projectItems.length
+              const isDuplicate = index >= scrollingTrackProjectItems.length
 
               return (
                 <CardButton
@@ -161,17 +176,6 @@ export function ExperiencePage({ onBack, onCatalog }: ExperiencePageProps) {
             })}
           </div>
         </div>
-
-        <nav className="nav-panel" aria-label="Experience navigation" style={{ display: 'block', padding: '1.5rem' }}>
-          <p style={{ margin: 0, fontSize: 'clamp(0.85rem, 1.8vw, 1.2rem)', color: 'var(--yellow)', lineHeight: '1.5' }}>
-            USE THE CATALOG SEARCH TO BROWSE MY ENTIRE PROJECT ARCHIVE!{' '}<br /><br />
-            <span style={{ display: 'inline-block', margin: '0 0.5rem', verticalAlign: 'middle' }}>
-              <NavButton onClick={onCatalog} href="#/catalog">
-                CATALOG SEARCH
-              </NavButton>
-            </span>
-          </p>
-        </nav>
 
         <nav className="nav-panel experience-nav" aria-label="Experience navigation">
           <NavButton onClick={onBack}>BACK</NavButton>
