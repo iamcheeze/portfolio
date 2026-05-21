@@ -38,6 +38,82 @@
   pointer-events: none;
 }
 
+.home-scroll {
+  --home-fade-distance: 40svh;
+
+  position: relative;
+  z-index: 2;
+  height: 100svh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+.home-scroll-spacer {
+  height: calc(100svh + var(--home-fade-distance));
+  pointer-events: none;
+}
+
+.home-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.home-layer :is(a, button, .nav-btn, .home-track-card, .social-btn, .hero-scroll-hint) {
+  pointer-events: auto;
+}
+
+.home-layer.is-inactive :is(a, button, .nav-btn, .home-track-card, .social-btn, .hero-scroll-hint) {
+  pointer-events: none;
+}
+
+/* While scrolling, pass wheel through to the scroll container (native speed). */
+.home-scroll.is-scrolling .home-layer :is(a, button, .nav-btn, .home-track-card, .social-btn) {
+  pointer-events: none;
+}
+
+.home-scroll.is-scrolling .home-layer--hero .hero-scroll-hint {
+  pointer-events: auto;
+}
+
+.home-scroll.is-scrolling .home-layer--about .experience-nav .nav-btn {
+  pointer-events: auto;
+}
+
+.home-scroll.is-scrolling .nav-btn:hover .nav-btn-face,
+.home-scroll.is-scrolling .nav-btn:focus-visible .nav-btn-face,
+.home-scroll.is-scrolling .social-btn:hover,
+.home-scroll.is-scrolling .social-btn:focus-visible,
+.home-scroll.is-scrolling .home-track-card:hover,
+.home-scroll.is-scrolling .home-track-card:focus-visible {
+  transform: none;
+  opacity: inherit;
+  box-shadow: inherit;
+  border-color: inherit;
+}
+
+.home-layer--about {
+  z-index: 3;
+}
+
+.home-layer--hero .hero,
+.home-about-panel {
+  min-height: 100svh;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.home-about-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .hero {
   --hero-stack-gap: clamp(0.65rem, 2vw, 1rem);
 
@@ -73,7 +149,8 @@
 
 .hero-core .hero-copy,
 .hero-core .nav-panel,
-.hero-core .social-panel {
+.hero-core .social-panel,
+.hero-core .hero-scroll-hint {
   margin-inline: auto;
 }
 
@@ -289,6 +366,7 @@
   line-height: 1.45;
   letter-spacing: 0.04em;
   color: var(--yellow);
+  text-align: center;
   text-transform: uppercase;
 }
 
@@ -304,30 +382,31 @@
   border: 0;
 }
 
-/* Visible window: clips to tagline width; content width sets scroll distance */
+/* Single-line window: each tagline rises from below and fades in */
 .hero-tagline-viewport {
   display: block;
+  position: relative;
   overflow: hidden;
   width: 100%;
+  min-height: 1.45em;
 }
 
-.hero-tagline-track {
-  display: flex;
-  width: max-content;
-  animation: tagline-scroll 90s linear infinite;
-}
-
-.hero-tagline-chunk {
-  flex-shrink: 0;
+.hero-tagline-line {
+  display: block;
+  width: 100%;
+  line-height: 1.45;
   white-space: nowrap;
+  animation: tagline-rise-fade 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-@keyframes tagline-scroll {
+@keyframes tagline-rise-fade {
   from {
-    transform: translateX(0);
+    opacity: 0;
+    transform: translateY(85%);
   }
   to {
-    transform: translateX(-50%);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -482,6 +561,21 @@
   width: 1.35rem;
   height: 1.35rem;
   object-fit: contain;
+}
+
+.hero-scroll-hint {
+  display: none;
+}
+
+@keyframes hero-scroll-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(6px);
+  }
 }
 
 .experience-page {
@@ -1065,6 +1159,34 @@
 /* ---------------- VIEWPORT RESPONSIVITY RULES ---------------- */
 
 @media (max-width: 520px) {
+  .hero-scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    margin-top: 0;
+    padding: clamp(2rem, 3vw, 1rem) 0 0;
+    border: none;
+    background: none;
+    color: var(--yellow);
+    font-family: inherit;
+    font-size: clamp(0.6rem, 2.8vw, 0.75rem);
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: none;
+    line-height: 1.2;
+    cursor: pointer;
+    opacity: 0.88;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .hero-scroll-hint-arrow {
+    display: block;
+    color: var(--yellow);
+    opacity: 0.92;
+    animation: hero-scroll-bob 1.5s ease-in-out infinite;
+  }
+
   .nav-panel {
     flex-direction: column;
     align-items: stretch;
@@ -1308,7 +1430,13 @@
     transition: none !important;
   }
 
-  .hero-tagline-track {
+  .hero-tagline-line {
+    animation: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .hero-scroll-hint-arrow {
     animation: none !important;
     transform: none !important;
   }
@@ -1318,6 +1446,14 @@
     overflow-x: auto;
     -webkit-mask-image: none;
     mask-image: none;
+  }
+
+  .home-scroll {
+    scroll-behavior: auto;
+  }
+
+  .home-layer {
+    transition: none !important;
   }
 
   .experience-track,
@@ -1331,9 +1467,6 @@
     display: none;
   }
 
-  .hero-tagline-chunk + .hero-tagline-chunk {
-    display: none;
-  }
 
   .nav-btn-face,
   .social-btn {

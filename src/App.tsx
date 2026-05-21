@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CatalogPage } from './CatalogPage'
 import { ExperiencePage } from './ExperiencePage'
-import { AboutPage } from './AboutPage'
+import { HomeScrollPage, type HomeScrollControls } from './HomeScrollPage'
 import { ContactPage } from './ContactPage'
 import { HomeTrackCard } from './HomeTrackCard'
 import { NavButton } from './NavButton'
@@ -62,9 +62,26 @@ function getPageFromPath(): Page {
 
 function App() {
   const appRef = useRef<HTMLDivElement>(null)
+  const homeScrollRef = useRef<HomeScrollControls>(null)
   const [page, setPage] = useState<Page>(() => getPageFromPath())
   const [isTransitioning, setIsTransitioning] = useState(false)
   const homeTrackItems = [...scrollingTrackProjectItems, ...scrollingTrackProjectItems]
+
+  const syncHomeSection = useCallback((section: 'home' | 'about') => {
+    const nextHash = section === 'about' ? '#/about' : '#/'
+    if (window.location.hash !== nextHash) {
+      window.location.replace(nextHash)
+    }
+    setPage(section)
+  }, [])
+
+  const revealAbout = useCallback(() => {
+    if (page !== 'about') syncHomeSection('about')
+  }, [page, syncHomeSection])
+
+  const revealHome = useCallback(() => {
+    if (page !== 'home') syncHomeSection('home')
+  }, [page, syncHomeSection])
 
   const transitionTo = useCallback((nextPage: Page, pushHistory = true) => {
     if (nextPage === page || isTransitioning) return
@@ -76,7 +93,16 @@ function App() {
       
     if (pushHistory) {
       // Set hash instead of pushState to prevent 404s on refresh
-      const nextHash = nextPage === 'catalog' ? '#/catalog' : nextPage === 'experience' ? '#/experience' : nextPage === 'about' ? '#/contact' : nextPage === 'contact' ? '#/contact' : '#/'
+      const nextHash =
+        nextPage === 'catalog'
+          ? '#/catalog'
+          : nextPage === 'experience'
+            ? '#/experience'
+            : nextPage === 'about'
+              ? '#/about'
+              : nextPage === 'contact'
+                ? '#/contact'
+                : '#/'
       window.location.hash = nextHash
     }
 
@@ -137,7 +163,20 @@ function App() {
    */
   useEffect(() => {
     const onHashChange = () => {
-      transitionTo(getPageFromPath(), false)
+      const next = getPageFromPath()
+
+      if (next === 'home' || next === 'about') {
+        if (next === 'about') {
+          homeScrollRef.current?.scrollToAbout('auto')
+          setPage('about')
+        } else {
+          homeScrollRef.current?.scrollToHero('auto')
+          setPage('home')
+        }
+        return
+      }
+
+      transitionTo(next, false)
     }
 
     window.addEventListener('hashchange', onHashChange)
@@ -150,97 +189,129 @@ function App() {
       <div className="hero-backdrop" aria-hidden="true" />
 
       <div className={`page-transition ${isTransitioning ? 'is-leaving' : 'is-entering'}`}>
-        {page === 'home' ? (
-          <main className="hero">
-            <div className="hero-marquee hero-marquee--top" aria-label="Featured projects, scrolling top row">
-              <div className="hero-track hero-track--rtl">
-                {homeTrackItems.map((item, index) => {
-                  const isDuplicate = index >= scrollingTrackProjectItems.length
+        {page === 'home' || page === 'about' ? (
+          <HomeScrollPage
+            ref={homeScrollRef}
+            startAtAbout={page === 'about'}
+            onRevealAbout={revealAbout}
+            onRevealHome={revealHome}
+            hero={
+              <main className="hero">
+                <div className="hero-marquee hero-marquee--top" aria-label="Featured projects, scrolling top row">
+                  <div className="hero-track hero-track--rtl">
+                    {homeTrackItems.map((item, index) => {
+                      const isDuplicate = index >= scrollingTrackProjectItems.length
 
-                  return (
-                    <HomeTrackCard
-                      key={`top-${item.title}-${index}`}
-                      href={item.href}
-                      image={item.image}
-                      title={item.title}
-                      ariaHidden={isDuplicate}
-                      tabIndex={isDuplicate ? -1 : 0}
-                    />
-                  )
-                })}
-              </div>
-            </div>
-
-            <div className="hero-core">
-              <div className="hero-glow" aria-hidden="true" />
-
-              <header className="hero-copy">
-                <h1 className="hero-title fade-in-header">RAYAN GHOSH</h1>
-                <div className="fade-in-tagline">
-                  <TaglineMarquee />
+                      return (
+                        <HomeTrackCard
+                          key={`top-${item.title}-${index}`}
+                          href={item.href}
+                          image={item.image}
+                          title={item.title}
+                          ariaHidden={isDuplicate}
+                          tabIndex={isDuplicate ? -1 : 0}
+                        />
+                      )
+                    })}
+                  </div>
                 </div>
-              </header>
 
-              <nav className="nav-panel fade-in-nav" aria-label="Main">
-                <NavButton
-                  onClick={() => transitionTo('experience')}
-                  href="#/experience"
-                >
-                  EXPERIENCE
-                </NavButton>
-                <NavButton
-                  onClick={() => transitionTo('about')}
-                  href="#/about"
-                >
-                  WHO AM I?
-                </NavButton>
-                <NavButton
-                  onClick={() => transitionTo('contact')}
-                  href="#/about"
-                >
-                  CONTACT
-                </NavButton>
-              </nav>
+                <div className="hero-core">
+                  <div className="hero-glow" aria-hidden="true" />
 
-              <nav className="social-panel fade-in-social" aria-label="Social media">
-                {socialLinks.map((item) => (
-                  <a
-                    className="social-btn"
-                    href={item.href}
-                    key={item.label}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={item.label}
+                  <header className="hero-copy">
+                    <h1 className="hero-title fade-in-header">RAYAN GHOSH</h1>
+                    <div className="fade-in-tagline">
+                      <TaglineMarquee />
+                    </div>
+                  </header>
+
+                  <nav className="nav-panel fade-in-nav" aria-label="Main">
+                    <NavButton
+                      onClick={() => transitionTo('experience')}
+                      href="#/experience"
+                    >
+                      EXPERIENCE
+                    </NavButton>
+                    <NavButton
+                      onClick={() => homeScrollRef.current?.scrollToAbout()}
+                      href="#/about"
+                    >
+                      WHO AM I?
+                    </NavButton>
+                    <NavButton
+                      onClick={() => transitionTo('contact')}
+                      href="#/contact"
+                    >
+                      CONTACT
+                    </NavButton>
+                  </nav>
+
+                  <nav className="social-panel fade-in-social" aria-label="Social media">
+                    {socialLinks.map((item) => (
+                      <a
+                        className="social-btn"
+                        href={item.href}
+                        key={item.label}
+                        target="_blank"
+                        rel="noreferrer"
+                        aria-label={item.label}
+                      >
+                        <img src={item.icon} alt="" />
+                      </a>
+                    ))}
+                  </nav>
+
+                  <button
+                    type="button"
+                    className="hero-scroll-hint fade-in-social"
+                    onClick={() => homeScrollRef.current?.scrollToAbout()}
+                    aria-label="Scroll down to Who Am I section"
                   >
-                    <img src={item.icon} alt="" />
-                  </a>
-                ))}
-              </nav>
-            </div>
+                    <span>(scroll down!)</span>
+                    <svg
+                      className="hero-scroll-hint-arrow"
+                      width="22"
+                      height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M6 9L12 15L18 9"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
 
-            <div className="hero-marquee hero-marquee--bottom" aria-label="Featured projects, scrolling bottom row">
-              <div className="hero-track hero-track--ltr">
-                {homeTrackItems.map((item, index) => {
-                  const isDuplicate = index >= scrollingTrackProjectItems.length
+                <div className="hero-marquee hero-marquee--bottom" aria-label="Featured projects, scrolling bottom row">
+                  <div className="hero-track hero-track--ltr">
+                    {homeTrackItems.map((item, index) => {
+                      const isDuplicate = index >= scrollingTrackProjectItems.length
 
-                  return (
-                    <HomeTrackCard
-                      key={`bottom-${item.title}-${index}`}
-                      href={item.href}
-                      image={item.image}
-                      title={item.title}
-                      ariaHidden={isDuplicate}
-                      tabIndex={isDuplicate ? -1 : 0}
-                    />
-                  )
-                })}
-              </div>
-            </div>
-          </main>
+                      return (
+                        <HomeTrackCard
+                          key={`bottom-${item.title}-${index}`}
+                          href={item.href}
+                          image={item.image}
+                          title={item.title}
+                          ariaHidden={isDuplicate}
+                          tabIndex={isDuplicate ? -1 : 0}
+                        />
+                      )
+                    })}
+                  </div>
+                </div>
+              </main>
+            }
+          />
         ) : page === 'experience' ? (
           <ExperiencePage onBack={() => transitionTo('home')} onCatalog={() => transitionTo('catalog')} />
-        ) : page === 'about' ? (
-          <AboutPage onBack={() => transitionTo('home')} />
         ) : page === 'contact' ? (
           <ContactPage onBack={() => transitionTo('home')} />
         ) : (
