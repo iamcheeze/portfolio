@@ -158,6 +158,11 @@ export function SceneBackground() {
     const bottomFogPlane = createBottomFogPlane()
     scene.add(bottomFogPlane)
 
+    const syncBottomFogScale = () => {
+      // Keep the fog band spanning the full view on tall/narrow phones.
+      bottomFogPlane.scale.x = Math.max(1, 1.15 / Math.max(camera.aspect, 0.35))
+    }
+
     const farGroup = new THREE.Group()
     const midFarGroup = new THREE.Group()
     const midGroup = new THREE.Group()
@@ -248,6 +253,7 @@ export function SceneBackground() {
       const h = Math.max(container.clientHeight, 1)
       camera.aspect = w / h
       camera.updateProjectionMatrix()
+      syncBottomFogScale()
 
       templates.forEach((template) => {
         if (!template) return
@@ -264,8 +270,9 @@ export function SceneBackground() {
           const randomZ = randomRange(layer.zMin, layer.zMax)
           const bounds = getCameraBoundsAtZ(camera, camBase.z, randomZ)
 
-          const randomX = randomRange(-bounds.xMax, bounds.xMax)
-          const randomY = randomRange(-bounds.yMax, bounds.yMax)
+          const spread = isMobileDevice ? 0.72 : 1
+          const randomX = randomRange(-bounds.xMax * spread, bounds.xMax * spread)
+          const randomY = randomRange(-bounds.yMax * spread, bounds.yMax * spread)
 
           instance.position.set(randomX, randomY, randomZ)
           instance.rotation.set(
@@ -312,14 +319,33 @@ export function SceneBackground() {
       document.documentElement.addEventListener('mouseleave', onLeave)
     }
 
+    const resetDepthGroupTransforms = () => {
+      for (const group of depthGroups) {
+        group.position.set(0, 0, 0)
+        group.rotation.set(0, 0, 0)
+      }
+      camera.position.copy(camBase)
+    }
+
     const resize = () => {
-      const w = container.clientWidth
-      const h = Math.max(container.clientHeight, 1)
+      const w = container.clientWidth || window.innerWidth
+      const h = Math.max(container.clientHeight || window.innerHeight, 1)
+      const nextIsMobile =
+        w <= 768 || window.matchMedia('(hover: none) and (pointer: coarse)').matches
+
+      if (nextIsMobile && !isMobile) {
+        resetDepthGroupTransforms()
+        targetX = 0
+        targetY = 0
+        smoothX = 0
+        smoothY = 0
+      }
+
+      isMobile = nextIsMobile
       camera.aspect = w / h
       camera.updateProjectionMatrix()
+      syncBottomFogScale()
       renderer.setSize(w, h)
-
-      isMobile = w <= 768 || window.matchMedia('(hover: none) and (pointer: coarse)').matches
     }
 
     resize()
@@ -334,23 +360,19 @@ export function SceneBackground() {
       time += 0.016
 
       if (isMobile) {
-        // --- MOBILE SINE WAVE ANIMATION (PRESERVED) ---
-        const mobileAmplitude = 0.6
+        const mobileAmplitude = 0.45
         const mobileSpeed = 1.0
         const sinValue = Math.sin(time * mobileSpeed)
 
-        depthGroups.forEach((group, index) => {
-          const phaseMult = index % 2 === 0 ? -1 : 1
-          group.position.y = sinValue * mobileAmplitude * phaseMult
-          group.position.x = lerp(group.position.x, 0, 0.05)
-          group.rotation.x = lerp(group.rotation.x, 0, 0.05)
-          group.rotation.y = lerp(group.rotation.y, 0, 0.05)
-          group.rotation.z = lerp(group.rotation.z, 0, 0.05)
+        depthGroups.forEach((group) => {
+          group.position.x = 0
+          group.position.y = sinValue * mobileAmplitude
+          group.rotation.x = 0
+          group.rotation.y = 0
+          group.rotation.z = 0
         })
 
-        camera.position.x = lerp(camera.position.x, camBase.x, 0.05)
-        camera.position.y = lerp(camera.position.y, camBase.y, 0.05)
-        camera.position.z = camBase.z
+        camera.position.copy(camBase)
 
       } else {
         // --- DESKTOP PARALLAX ANIMATION (PRESERVED) ---

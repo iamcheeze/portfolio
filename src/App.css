@@ -39,8 +39,6 @@
 }
 
 .home-scroll {
-  --home-fade-distance: 40svh;
-
   position: relative;
   z-index: 2;
   height: 100svh;
@@ -48,70 +46,21 @@
   overflow-y: auto;
   scroll-behavior: smooth;
   overscroll-behavior: contain;
+  scroll-snap-type: y proximity;
 }
 
-.home-scroll-spacer {
-  height: calc(100svh + var(--home-fade-distance));
-  pointer-events: none;
-}
-
-.home-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 2;
-  overflow: hidden;
-  pointer-events: none;
-  will-change: opacity;
-}
-
-.home-layer :is(a, button, .nav-btn, .home-track-card, .social-btn, .hero-scroll-hint) {
-  pointer-events: auto;
-}
-
-.home-layer.is-inactive :is(a, button, .nav-btn, .home-track-card, .social-btn, .hero-scroll-hint) {
-  pointer-events: none;
-}
-
-/* While scrolling, pass wheel through to the scroll container (native speed). */
-.home-scroll.is-scrolling .home-layer :is(a, button, .nav-btn, .home-track-card, .social-btn) {
-  pointer-events: none;
-}
-
-.home-scroll.is-scrolling .home-layer--hero .hero-scroll-hint {
-  pointer-events: auto;
-}
-
-.home-scroll.is-scrolling .home-layer--about .experience-nav .nav-btn {
-  pointer-events: auto;
-}
-
-.home-scroll.is-scrolling .nav-btn:hover .nav-btn-face,
-.home-scroll.is-scrolling .nav-btn:focus-visible .nav-btn-face,
-.home-scroll.is-scrolling .social-btn:hover,
-.home-scroll.is-scrolling .social-btn:focus-visible,
-.home-scroll.is-scrolling .home-track-card:hover,
-.home-scroll.is-scrolling .home-track-card:focus-visible {
-  transform: none;
-  opacity: inherit;
-  box-shadow: inherit;
-  border-color: inherit;
-}
-
-.home-layer--about {
-  z-index: 3;
-}
-
-.home-layer--hero .hero,
-.home-about-panel {
+.home-scroll-panel {
+  flex-shrink: 0;
   min-height: 100svh;
-  height: 100%;
-  box-sizing: border-box;
+  scroll-snap-align: start;
 }
 
 .home-about-panel {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-height: 100svh;
+  box-sizing: border-box;
 }
 
 .hero {
@@ -147,6 +96,89 @@
   text-align: center;
 }
 
+.hero-dismiss-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--hero-stack-gap);
+  width: 100%;
+}
+
+/* Scroll shrink: each block scales to nothing at a different rate (title fastest). */
+.hero-dismiss-group .hero-copy {
+  transform: none;
+  will-change: auto;
+}
+
+.hero-scroll-part {
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.hero-scroll-part--title {
+  --hero-scroll-shrink-rate: 1.85;
+  --hero-scroll-lift: -1.85rem;
+  transform: translate3d(
+      calc(var(--px, 0) * 8px),
+      calc(var(--py, 0) * 6px + var(--hero-reveal-progress, 0) * var(--hero-scroll-lift)),
+      0
+    )
+    scale(
+      max(
+        0.001,
+        calc(1 - var(--hero-reveal-progress, 0) * var(--hero-scroll-shrink-rate))
+      )
+    );
+}
+
+.hero-scroll-part--tagline {
+  --hero-scroll-shrink-rate: 1.42;
+  --hero-scroll-lift: -1.35rem;
+  transform: translate3d(
+      calc(var(--px, 0) * 5px),
+      calc(var(--py, 0) * 4px + var(--hero-reveal-progress, 0) * var(--hero-scroll-lift)),
+      0
+    )
+    scale(
+      max(
+        0.001,
+        calc(1 - var(--hero-reveal-progress, 0) * var(--hero-scroll-shrink-rate))
+      )
+    );
+}
+
+.hero-dismiss-group .hero-scroll-part--nav {
+  --hero-scroll-shrink-rate: 1.12;
+  --hero-scroll-lift: -1rem;
+  transform: translate3d(
+      calc(var(--px, 0) * 14px),
+      calc(var(--py, 0) * 10px + var(--hero-reveal-progress, 0) * var(--hero-scroll-lift)),
+      0
+    )
+    scale(
+      max(
+        0.001,
+        calc(1 - var(--hero-reveal-progress, 0) * var(--hero-scroll-shrink-rate))
+      )
+    );
+}
+
+.hero-dismiss-group .hero-scroll-part--social {
+  --hero-scroll-shrink-rate: 0.92;
+  --hero-scroll-lift: -0.75rem;
+  transform: translate3d(
+      calc(var(--px, 0) * 12px),
+      calc(var(--py, 0) * 8px + var(--hero-reveal-progress, 0) * var(--hero-scroll-lift)),
+      0
+    )
+    scale(
+      max(
+        0.001,
+        calc(1 - var(--hero-reveal-progress, 0) * var(--hero-scroll-shrink-rate))
+      )
+    );
+}
+
 .hero-core .hero-copy,
 .hero-core .nav-panel,
 .hero-core .social-panel,
@@ -158,8 +190,17 @@
   width: 100%;
   overflow: hidden;
   padding: 0.35rem 0;
+  will-change: transform;
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.hero-marquee--top {
+  transform: translateX(calc(var(--hero-reveal-progress, 0) * 105vw));
+}
+
+.hero-marquee--bottom {
+  transform: translateX(calc(var(--hero-reveal-progress, 0) * -105vw));
 }
 
 .hero-track {
@@ -1265,15 +1306,91 @@
     font-size: clamp(0.85rem, 2.5vw, 1.15rem);
   }
 
-  .hero-glow,
+  .hero-glow {
+    top: 42%;
+    transform: translate(-50%, -50%) !important;
+    will-change: auto;
+  }
+
   .hero-copy,
-  .nav-panel,
-  .social-panel,
+  .nav-panel:not(.hero-scroll-part),
+  .social-panel:not(.hero-scroll-part),
   .experience-glow,
   .experience-shell,
   .catalog-shell {
     transform: none !important;
     will-change: auto;
+  }
+
+  .hero-core {
+    width: 100%;
+    overflow-x: clip;
+  }
+
+  .hero-dismiss-group,
+  .hero-dismiss-group .hero-copy {
+    width: 100%;
+    max-width: 100%;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .hero-title {
+    width: 100%;
+    text-align: center;
+  }
+
+  .hero-tagline {
+    width: min(100%, 94vw);
+    margin-inline: auto;
+  }
+
+  .hero-tagline-line {
+    white-space: normal;
+    text-wrap: balance;
+  }
+
+  .hero-scroll-part--title {
+    transform: translate3d(
+        0,
+        calc(var(--hero-reveal-progress, 0) * var(--hero-scroll-lift)),
+        0
+      )
+      scale(
+        max(
+          0.001,
+          calc(1 - var(--hero-reveal-progress, 0) * var(--hero-scroll-shrink-rate))
+        )
+      );
+  }
+
+  .hero-scroll-part--tagline {
+    transform: translate3d(
+        0,
+        calc(var(--hero-reveal-progress, 0) * var(--hero-scroll-lift)),
+        0
+      )
+      scale(
+        max(
+          0.001,
+          calc(1 - var(--hero-reveal-progress, 0) * var(--hero-scroll-shrink-rate))
+        )
+      );
+  }
+
+  .hero-dismiss-group .hero-scroll-part--nav,
+  .hero-dismiss-group .hero-scroll-part--social {
+    transform: translate3d(
+        0,
+        calc(var(--hero-reveal-progress, 0) * var(--hero-scroll-lift)),
+        0
+      )
+      scale(
+        max(
+          0.001,
+          calc(1 - var(--hero-reveal-progress, 0) * var(--hero-scroll-shrink-rate))
+        )
+      );
   }
 
   /* Fix glass UI rendering issues on mobile */
@@ -1373,12 +1490,10 @@
   0% {
     opacity: 0;
     filter: blur(12px);
-    transform: translateZ(0);
   }
   100% {
     opacity: 1;
     filter: blur(0px);
-    transform: translateZ(0);
   }
 }
 
@@ -1412,15 +1527,36 @@
 /* ---------------- REDUCTION SYSTEM OVERRIDES ---------------- */
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-glow,
+  .hero-glow {
+    transform: translate(-50%, -50%) !important;
+    will-change: auto;
+  }
+
   .hero-copy,
   .nav-panel,
   .social-panel,
+  .hero-dismiss-group,
   .experience-glow,
   .experience-shell,
   .catalog-shell {
     transform: none !important;
     will-change: auto;
+  }
+
+  .hero-scroll-part--title {
+    opacity: max(0, calc(1 - var(--hero-reveal-progress, 0) * 1.85));
+  }
+
+  .hero-scroll-part--tagline {
+    opacity: max(0, calc(1 - var(--hero-reveal-progress, 0) * 1.42));
+  }
+
+  .hero-scroll-part--nav {
+    opacity: max(0, calc(1 - var(--hero-reveal-progress, 0) * 1.12));
+  }
+
+  .hero-scroll-part--social {
+    opacity: max(0, calc(1 - var(--hero-reveal-progress, 0) * 0.92));
   }
 
   .page-transition {
@@ -1450,10 +1586,6 @@
 
   .home-scroll {
     scroll-behavior: auto;
-  }
-
-  .home-layer {
-    transition: none !important;
   }
 
   .experience-track,
@@ -1487,6 +1619,9 @@
     opacity: 1 !important;
     filter: none !important;
     animation: none !important;
+  }
+
+  .hero-scroll-part {
     transform: none !important;
   }
 }

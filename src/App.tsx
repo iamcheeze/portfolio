@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CatalogPage } from './CatalogPage'
-import { ExperiencePage } from './ExperiencePage'
 import { HomeScrollPage, type HomeScrollControls } from './HomeScrollPage'
-import { ContactPage } from './ContactPage'
 import { HomeTrackCard } from './HomeTrackCard'
 import { NavButton } from './NavButton'
 import { SceneBackground } from './SceneBackground'
@@ -15,6 +13,7 @@ import linkedinIcon from './assets/linkedinIcon.svg'
 import './App.css'
 
 type Page = 'home' | 'experience' | 'catalog' | 'about' | 'contact'
+type ScrollSection = 'home' | 'about' | 'experience' | 'contact'
 
 const TRANSITION_MS = 420
 
@@ -60,6 +59,21 @@ function getPageFromPath(): Page {
   }
 }
 
+function sectionToHash(section: ScrollSection): string {
+  switch (section) {
+    case 'about': return '#/about'
+    case 'experience': return '#/experience'
+    case 'contact': return '#/contact'
+    default: return '#/'
+  }
+}
+
+const SCROLL_SECTIONS: ScrollSection[] = ['home', 'about', 'experience', 'contact']
+
+function isScrollSection(page: Page): page is ScrollSection {
+  return SCROLL_SECTIONS.includes(page as ScrollSection)
+}
+
 function App() {
   const appRef = useRef<HTMLDivElement>(null)
   const homeScrollRef = useRef<HomeScrollControls>(null)
@@ -67,44 +81,41 @@ function App() {
   const [isTransitioning, setIsTransitioning] = useState(false)
   const homeTrackItems = [...scrollingTrackProjectItems, ...scrollingTrackProjectItems]
 
-  const syncHomeSection = useCallback((section: 'home' | 'about') => {
-    const nextHash = section === 'about' ? '#/about' : '#/'
+  const onSectionChange = useCallback((section: ScrollSection) => {
+    const nextHash = sectionToHash(section)
     if (window.location.hash !== nextHash) {
-      window.location.replace(nextHash)
+      window.history.replaceState(null, '', nextHash)
     }
     setPage(section)
   }, [])
 
-  const revealAbout = useCallback(() => {
-    if (page !== 'about') syncHomeSection('about')
-  }, [page, syncHomeSection])
-
-  const revealHome = useCallback(() => {
-    if (page !== 'home') syncHomeSection('home')
-  }, [page, syncHomeSection])
-
   const transitionTo = useCallback((nextPage: Page, pushHistory = true) => {
     if (nextPage === page || isTransitioning) return
+
+    // If scrolling to a section within the home scroll, just scroll there
+    if (isScrollSection(nextPage) && isScrollSection(page)) {
+      homeScrollRef.current?.scrollToSection(nextPage)
+      return
+    }
 
     setIsTransitioning(true)
 
     window.setTimeout(() => {
       setPage(nextPage)
-      
-    if (pushHistory) {
-      // Set hash instead of pushState to prevent 404s on refresh
-      const nextHash =
-        nextPage === 'catalog'
-          ? '#/catalog'
-          : nextPage === 'experience'
-            ? '#/experience'
-            : nextPage === 'about'
-              ? '#/about'
-              : nextPage === 'contact'
-                ? '#/contact'
-                : '#/'
-      window.location.hash = nextHash
-    }
+
+      if (pushHistory) {
+        const nextHash =
+          nextPage === 'catalog'
+            ? '#/catalog'
+            : nextPage === 'experience'
+              ? '#/experience'
+              : nextPage === 'about'
+                ? '#/about'
+                : nextPage === 'contact'
+                  ? '#/contact'
+                  : '#/'
+        window.location.hash = nextHash
+      }
 
       window.setTimeout(() => {
         setIsTransitioning(false)
@@ -165,14 +176,9 @@ function App() {
     const onHashChange = () => {
       const next = getPageFromPath()
 
-      if (next === 'home' || next === 'about') {
-        if (next === 'about') {
-          homeScrollRef.current?.scrollToAbout('auto')
-          setPage('about')
-        } else {
-          homeScrollRef.current?.scrollToHero('auto')
-          setPage('home')
-        }
+      if (isScrollSection(next)) {
+        homeScrollRef.current?.scrollToSection(next, 'auto')
+        setPage(next)
         return
       }
 
@@ -189,12 +195,12 @@ function App() {
       <div className="hero-backdrop" aria-hidden="true" />
 
       <div className={`page-transition ${isTransitioning ? 'is-leaving' : 'is-entering'}`}>
-        {page === 'home' || page === 'about' ? (
+        {isScrollSection(page) ? (
           <HomeScrollPage
             ref={homeScrollRef}
-            startAtAbout={page === 'about'}
-            onRevealAbout={revealAbout}
-            onRevealHome={revealHome}
+            startAt={page}
+            onSectionChange={onSectionChange}
+            onCatalog={() => transitionTo('catalog')}
             hero={
               <main className="hero">
                 <div className="hero-marquee hero-marquee--top" aria-label="Featured projects, scrolling top row">
@@ -219,53 +225,63 @@ function App() {
                 <div className="hero-core">
                   <div className="hero-glow" aria-hidden="true" />
 
-                  <header className="hero-copy">
-                    <h1 className="hero-title fade-in-header">RAYAN GHOSH</h1>
-                    <div className="fade-in-tagline">
-                      <TaglineMarquee />
-                    </div>
-                  </header>
+                  <div className="hero-dismiss-group">
+                    <header className="hero-copy">
+                      <h1 className="hero-title fade-in-header hero-scroll-part hero-scroll-part--title">
+                        RAYAN GHOSH
+                      </h1>
+                      <div className="fade-in-tagline hero-scroll-part hero-scroll-part--tagline">
+                        <TaglineMarquee />
+                      </div>
+                    </header>
 
-                  <nav className="nav-panel fade-in-nav" aria-label="Main">
-                    <NavButton
-                      onClick={() => transitionTo('experience')}
-                      href="#/experience"
+                    <nav
+                      className="nav-panel fade-in-nav hero-scroll-part hero-scroll-part--nav"
+                      aria-label="Main"
                     >
-                      EXPERIENCE
-                    </NavButton>
-                    <NavButton
-                      onClick={() => homeScrollRef.current?.scrollToAbout()}
-                      href="#/about"
-                    >
-                      WHO AM I?
-                    </NavButton>
-                    <NavButton
-                      onClick={() => transitionTo('contact')}
-                      href="#/contact"
-                    >
-                      CONTACT
-                    </NavButton>
-                  </nav>
-
-                  <nav className="social-panel fade-in-social" aria-label="Social media">
-                    {socialLinks.map((item) => (
-                      <a
-                        className="social-btn"
-                        href={item.href}
-                        key={item.label}
-                        target="_blank"
-                        rel="noreferrer"
-                        aria-label={item.label}
+                      <NavButton
+                        onClick={() => homeScrollRef.current?.scrollToSection('experience')}
+                        href="#/experience"
                       >
-                        <img src={item.icon} alt="" />
-                      </a>
-                    ))}
-                  </nav>
+                        EXPERIENCE
+                      </NavButton>
+                      <NavButton
+                        onClick={() => homeScrollRef.current?.scrollToSection('about')}
+                        href="#/about"
+                      >
+                        WHO AM I?
+                      </NavButton>
+                      <NavButton
+                        onClick={() => homeScrollRef.current?.scrollToSection('contact')}
+                        href="#/contact"
+                      >
+                        CONTACT
+                      </NavButton>
+                    </nav>
+
+                    <nav
+                      className="social-panel fade-in-social hero-scroll-part hero-scroll-part--social"
+                      aria-label="Social media"
+                    >
+                      {socialLinks.map((item) => (
+                        <a
+                          className="social-btn"
+                          href={item.href}
+                          key={item.label}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={item.label}
+                        >
+                          <img src={item.icon} alt="" />
+                        </a>
+                      ))}
+                    </nav>
+                  </div>
 
                   <button
                     type="button"
                     className="hero-scroll-hint fade-in-social"
-                    onClick={() => homeScrollRef.current?.scrollToAbout()}
+                    onClick={() => homeScrollRef.current?.scrollToSection('about')}
                     aria-label="Scroll down to Who Am I section"
                   >
                     <span>(scroll down!)</span>
@@ -310,10 +326,6 @@ function App() {
               </main>
             }
           />
-        ) : page === 'experience' ? (
-          <ExperiencePage onBack={() => transitionTo('home')} onCatalog={() => transitionTo('catalog')} />
-        ) : page === 'contact' ? (
-          <ContactPage onBack={() => transitionTo('home')} />
         ) : (
           <CatalogPage onBack={() => transitionTo('experience')} />
         )}
