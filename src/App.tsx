@@ -38,6 +38,10 @@ const socialLinks = [
     href: 'https://iamcheeze.itch.io/',
     icon: itchIcon,
   },
+  {
+    label: '(CV)',
+    href: 'https://drive.google.com/file/d/1XjYry0P2eFwgLl42o_59LYiaFuc3QeTJ/view',
+  },
 ]
 
 /** * Detection logic: GitHub Pages friendly hash check 
@@ -63,6 +67,16 @@ function sectionToHash(section: ScrollSection): string {
   switch (section) {
     case 'about': return '#/about'
     case 'experience': return '#/experience'
+    case 'contact': return '#/contact'
+    default: return '#/'
+  }
+}
+
+function pageToHash(page: Page): string {
+  switch (page) {
+    case 'catalog': return '#/catalog'
+    case 'experience': return '#/experience'
+    case 'about': return '#/about'
     case 'contact': return '#/contact'
     default: return '#/'
   }
@@ -104,17 +118,8 @@ function App() {
       setPage(nextPage)
 
       if (pushHistory) {
-        const nextHash =
-          nextPage === 'catalog'
-            ? '#/catalog'
-            : nextPage === 'experience'
-              ? '#/experience'
-              : nextPage === 'about'
-                ? '#/about'
-                : nextPage === 'contact'
-                  ? '#/contact'
-                  : '#/'
-        window.location.hash = nextHash
+        const nextHash = pageToHash(nextPage)
+        window.history.pushState(null, '', nextHash)
       }
 
       window.setTimeout(() => {
@@ -122,6 +127,14 @@ function App() {
       }, 60)
     }, TRANSITION_MS)
   }, [isTransitioning, page])
+
+  const openCatalog = useCallback(() => {
+    if (window.location.hash !== '#/catalog') {
+      window.history.pushState(null, '', '#/catalog')
+    }
+    setIsTransitioning(false)
+    setPage('catalog')
+  }, [])
 
   useEffect(() => {
     const root = appRef.current
@@ -170,11 +183,17 @@ function App() {
   }, [])
 
   /**
-   * Listen for browser back/forward buttons using hashchange
+   * Listen for browser back/forward and manual hash edits.
    */
   useEffect(() => {
-    const onHashChange = () => {
+    const onLocationChange = () => {
       const next = getPageFromPath()
+
+      if (next === 'catalog') {
+        setIsTransitioning(false)
+        setPage('catalog')
+        return
+      }
 
       if (isScrollSection(next)) {
         homeScrollRef.current?.scrollToSection(next, 'auto')
@@ -185,8 +204,12 @@ function App() {
       transitionTo(next, false)
     }
 
-    window.addEventListener('hashchange', onHashChange)
-    return () => window.removeEventListener('hashchange', onHashChange)
+    window.addEventListener('hashchange', onLocationChange)
+    window.addEventListener('popstate', onLocationChange)
+    return () => {
+      window.removeEventListener('hashchange', onLocationChange)
+      window.removeEventListener('popstate', onLocationChange)
+    }
   }, [transitionTo])
 
   return (
@@ -200,7 +223,7 @@ function App() {
             ref={homeScrollRef}
             startAt={page}
             onSectionChange={onSectionChange}
-            onCatalog={() => transitionTo('catalog')}
+            onCatalog={openCatalog}
             hero={
               <main className="hero">
                 <div className="hero-marquee hero-marquee--top" aria-label="Featured projects, scrolling top row">
@@ -225,7 +248,34 @@ function App() {
                 <div className="hero-core">
                   <div className="hero-glow" aria-hidden="true" />
 
-                  <div className="hero-dismiss-group">
+                  <div className="hero-dismiss-layout">
+                    <button
+                      type="button"
+                      className="hero-scroll-hint hero-scroll-hint--desktop hero-scroll-hint--desktop-left fade-in-social"
+                      onClick={() => homeScrollRef.current?.scrollToSection('about')}
+                      aria-label="Scroll down to Who Am I section"
+                    >
+                      <span>(scroll down!)</span>
+                      <svg
+                        className="hero-scroll-hint-arrow"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M6 9L12 15L18 9"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
+
+                    <div className="hero-dismiss-group">
                     <header className="hero-copy">
                       <h1 className="hero-title fade-in-header hero-scroll-part hero-scroll-part--title">
                         RAYAN GHOSH
@@ -272,10 +322,41 @@ function App() {
                           rel="noreferrer"
                           aria-label={item.label}
                         >
-                          <img src={item.icon} alt="" />
+                          {item.icon ? (
+                            <img src={item.icon} alt="" />
+                          ) : (
+                            <span className="social-btn-label">{item.label}</span>
+                          )}
                         </a>
                       ))}
                     </nav>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="hero-scroll-hint hero-scroll-hint--desktop hero-scroll-hint--desktop-right fade-in-social"
+                      onClick={() => homeScrollRef.current?.scrollToSection('about')}
+                      aria-label="Scroll down to Who Am I section"
+                    >
+                      <span>(scroll down!)</span>
+                      <svg
+                        className="hero-scroll-hint-arrow"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M6 9L12 15L18 9"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
                   </div>
 
                   <button

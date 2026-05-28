@@ -150,7 +150,7 @@ export function ExperiencePage({ onBack, onCatalog }: ExperiencePageProps) {
           <p style={{ margin: 0, fontSize: 'clamp(0.85rem, 1.8vw, 1.2rem)', color: 'var(--yellow)', lineHeight: '1.5' }}>
             USE THE CATALOG SEARCH TO BROWSE MY ENTIRE PROJECT ARCHIVE!{' '}<br /><br />
             <span style={{ display: 'inline-block', margin: '0 0.5rem', verticalAlign: 'middle' }}>
-              <NavButton onClick={onCatalog} href="#/catalog">
+              <NavButton onClick={onCatalog}>
                 CATALOG SEARCH
               </NavButton>
             </span>

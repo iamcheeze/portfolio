@@ -258,7 +258,7 @@ export const projectItems: ProjectItem[] = [
     label: 'Hackathon Entry',
     title: 'Student Sorter 3000',
     image: studentSorterThumbnail,
-    href: 'https://iamcheeze.itch.io/student-sorter-3000',
+    href: 'https://iamcheeze.itch.io/studentsorter3000',
     tag: 'Hackathon / Game Jam Entry',
     includeInScrollingTracks: true,
   },
