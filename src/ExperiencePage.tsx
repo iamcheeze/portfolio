@@ -30,7 +30,7 @@ export function ExperiencePage({ onCatalog, onHighlight }: ExperiencePageProps) 
             lineHeight: '1.5',
           }}
         >
-          Check out projects I have created and contributed to here!
+          Here are some highlights of my work! Click on a project to learn more.
         </p>
 
         <div className="highlights-grid" role="list" aria-label="Featured highlights">
@@ -55,7 +55,7 @@ export function ExperiencePage({ onCatalog, onHighlight }: ExperiencePageProps) 
           ))}
         </div>
 
-        <div className="experience-marquee" aria-label="Experience image placeholders">
+          {/* <div className="experience-marquee" aria-label="Experience image placeholders">
           <div className="experience-track">
             {scrollingItems.map((item, index) => {
               const isDuplicate = index >= scrollingTrackProjectItems.length
@@ -73,7 +73,7 @@ export function ExperiencePage({ onCatalog, onHighlight }: ExperiencePageProps) 
               )
             })}
           </div>
-        </div>
+        </div>*/}
         <nav className="nav-panel" aria-label="Experience navigation" style={{ display: 'block', padding: '1.5rem' }}>
           <p
             style={{

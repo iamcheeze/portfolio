@@ -648,11 +648,6 @@ export function BackstoryPage({
                     />
                   </section>
                 ))}
-                <BackstoryJourneyArrow
-                  containerRef={journeyRef}
-                  nodeMapRef={nodeMapRef}
-                  layoutVersion={layoutVersion}
-                />
               </div>
             )}
           </div>
