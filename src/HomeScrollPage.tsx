@@ -10,17 +10,21 @@ import {
 } from 'react'
 import { AboutSection } from './AboutPage'
 import { ExperiencePage } from './ExperiencePage'
-import { ContactPage } from './ContactPage'
+import type { HighlightId } from './highlightsData'
+import { ScrollNav } from './ScrollNav'
+import { SiteFooter } from './SiteFooter'
 
-type Section = 'home' | 'about' | 'experience' | 'contact'
+type Section = 'home' | 'about' | 'experience'
 
-const SECTIONS: Section[] = ['home', 'about', 'experience', 'contact']
+const SECTIONS: Section[] = ['home', 'about', 'experience']
 
 type HomeScrollPageProps = {
   startAt: Section
   onSectionChange: (section: Section) => void
   hero: ReactNode
   onCatalog: () => void
+  onBackstory: () => void
+  onHighlight: (id: HighlightId) => void
 }
 
 export type HomeScrollControls = {
@@ -28,14 +32,14 @@ export type HomeScrollControls = {
 }
 
 export const HomeScrollPage = forwardRef<HomeScrollControls, HomeScrollPageProps>(
-  function HomeScrollPage({ startAt, onSectionChange, hero, onCatalog }, ref) {
+  function HomeScrollPage({ startAt, onSectionChange, hero, onCatalog, onBackstory, onHighlight }, ref) {
     const scrollRef = useRef<HTMLElement>(null)
     const openAtOnMount = useRef(startAt)
     const [heroProgress, setHeroProgress] = useState(startAt === 'home' ? 0 : 1)
 
     const getPanelOffsets = useCallback(() => {
       const el = scrollRef.current
-      if (!el) return { home: 0, about: 0, experience: 0, contact: 0 }
+      if (!el) return { home: 0, about: 0, experience: 0 }
 
       const getOffset = (section: Section) => {
         const panel = el.querySelector<HTMLElement>(`[data-scroll-section="${section}"]`)
@@ -46,7 +50,6 @@ export const HomeScrollPage = forwardRef<HomeScrollControls, HomeScrollPageProps
         home: getOffset('home'),
         about: getOffset('about'),
         experience: getOffset('experience'),
-        contact: getOffset('contact'),
       }
     }, [])
 
@@ -111,19 +114,21 @@ export const HomeScrollPage = forwardRef<HomeScrollControls, HomeScrollPageProps
       }
     }, [getPanelOffsets, onSectionChange])
 
-    const handleBackFromAbout = () => {
-      scrollToSection('home')
-    }
-
     const handleBackFromExperience = () => {
       scrollToSection('about')
     }
 
-    const handleBackFromContact = () => {
-      scrollToSection('experience')
-    }
+    const showScrollNav = heroProgress > 0.35
 
     return (
+      <>
+      <ScrollNav
+        visible={showScrollNav}
+        onHome={() => scrollToSection('home')}
+        onExperience={() => scrollToSection('experience')}
+        onAbout={() => scrollToSection('about')}
+        onCatalog={onCatalog}
+      />
       <section ref={scrollRef} className="home-scroll" aria-label="Main content">
         {/* Panel 0 — Hero */}
         <div
@@ -142,8 +147,7 @@ export const HomeScrollPage = forwardRef<HomeScrollControls, HomeScrollPageProps
           aria-hidden={heroProgress < 0.08}
         >
           <main className="experience-page home-about-panel">
-            <div className="experience-glow" aria-hidden="true" />
-            <AboutSection showBack onBack={handleBackFromAbout} />
+            <AboutSection onLearnMore={onBackstory} />
           </main>
         </div>
 
@@ -152,14 +156,16 @@ export const HomeScrollPage = forwardRef<HomeScrollControls, HomeScrollPageProps
           <ExperiencePage
             onBack={handleBackFromExperience}
             onCatalog={onCatalog}
+            onHighlight={onHighlight}
           />
         </div>
 
-        {/* Panel 3 — Contact */}
-        <div className="home-scroll-panel home-scroll-panel--contact" data-scroll-section="contact">
-          <ContactPage onBack={handleBackFromContact} />
+        <div className="home-scroll-panel home-scroll-panel--footer">
+          <SiteFooter />
         </div>
+
       </section>
+      </>
     )
   },
 )

@@ -1,19 +1,28 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CatalogPage } from './CatalogPage'
+import { BackstoryPage } from './Backstory'
+import { HighlightProjectPage } from './HighlightProjectPage'
+import { SiteFooter } from './SiteFooter'
 import { HomeScrollPage, type HomeScrollControls } from './HomeScrollPage'
+import {
+  getHighlightById,
+  getHighlightFromHash,
+  isHighlightId,
+  type HighlightId,
+} from './highlightsData'
 import { HomeTrackCard } from './HomeTrackCard'
 import { NavButton } from './NavButton'
 import { SceneBackground } from './SceneBackground'
 import { TaglineMarquee } from './TaglineMarquee'
-import { scrollingTrackProjectItems } from './projectItems'
+import { scrollingTrackProjectItems, type ProjectItem } from './projectItems'
 import instagramIcon from './assets/instagramIcon.svg'
 import youtubeIcon from './assets/youtube.svg'
 import itchIcon from './assets/itchIcon.svg'
 import linkedinIcon from './assets/linkedinIcon.svg'
 import './App.css'
 
-type Page = 'home' | 'experience' | 'catalog' | 'about' | 'contact'
-type ScrollSection = 'home' | 'about' | 'experience' | 'contact'
+type Page = 'home' | 'experience' | 'catalog' | 'about' | 'backstory' | HighlightId
+type ScrollSection = 'home' | 'about' | 'experience'
 
 const TRANSITION_MS = 420
 
@@ -57,9 +66,14 @@ function getPageFromPath(): Page {
     case '#/about':
       return 'about'
     case '#/contact':
-      return 'contact'
-    default:
+      return 'experience'
+    case '#/backstory':
+      return 'backstory'
+    default: {
+      const highlight = getHighlightFromHash(hash)
+      if (highlight) return highlight.id
       return 'home'
+    }
   }
 }
 
@@ -67,7 +81,6 @@ function sectionToHash(section: ScrollSection): string {
   switch (section) {
     case 'about': return '#/about'
     case 'experience': return '#/experience'
-    case 'contact': return '#/contact'
     default: return '#/'
   }
 }
@@ -77,15 +90,32 @@ function pageToHash(page: Page): string {
     case 'catalog': return '#/catalog'
     case 'experience': return '#/experience'
     case 'about': return '#/about'
-    case 'contact': return '#/contact'
-    default: return '#/'
+    case 'backstory': return '#/backstory'
+    default: {
+      const highlight = isHighlightId(page) ? getHighlightById(page) : undefined
+      return highlight?.hash ?? '#/'
+    }
   }
 }
 
-const SCROLL_SECTIONS: ScrollSection[] = ['home', 'about', 'experience', 'contact']
+const SCROLL_SECTIONS: ScrollSection[] = ['home', 'about', 'experience']
 
 function isScrollSection(page: Page): page is ScrollSection {
   return SCROLL_SECTIONS.includes(page as ScrollSection)
+}
+
+function shuffleItems<T>(items: T[]): T[] {
+  const shuffled = [...items]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
+function buildMarqueeTrack(items: ProjectItem[]) {
+  const shuffled = shuffleItems(items)
+  return { track: [...shuffled, ...shuffled], uniqueCount: shuffled.length }
 }
 
 function App() {
@@ -93,7 +123,8 @@ function App() {
   const homeScrollRef = useRef<HomeScrollControls>(null)
   const [page, setPage] = useState<Page>(() => getPageFromPath())
   const [isTransitioning, setIsTransitioning] = useState(false)
-  const homeTrackItems = [...scrollingTrackProjectItems, ...scrollingTrackProjectItems]
+  const homeTopMarquee = useMemo(() => buildMarqueeTrack(scrollingTrackProjectItems), [])
+  const homeBottomMarquee = useMemo(() => buildMarqueeTrack(scrollingTrackProjectItems), [])
 
   const onSectionChange = useCallback((section: ScrollSection) => {
     const nextHash = sectionToHash(section)
@@ -134,6 +165,25 @@ function App() {
     }
     setIsTransitioning(false)
     setPage('catalog')
+  }, [])
+
+  const openBackstory = useCallback(() => {
+    if (window.location.hash !== '#/backstory') {
+      window.history.pushState(null, '', '#/backstory')
+    }
+    setIsTransitioning(false)
+    setPage('backstory')
+  }, [])
+
+  const openHighlight = useCallback((id: HighlightId) => {
+    const highlight = getHighlightById(id)
+    if (!highlight) return
+
+    if (window.location.hash !== highlight.hash) {
+      window.history.pushState(null, '', highlight.hash)
+    }
+    setIsTransitioning(false)
+    setPage(id)
   }, [])
 
   useEffect(() => {
@@ -195,6 +245,18 @@ function App() {
         return
       }
 
+      if (next === 'backstory') {
+        setIsTransitioning(false)
+        setPage('backstory')
+        return
+      }
+
+      if (isHighlightId(next)) {
+        setIsTransitioning(false)
+        setPage(next)
+        return
+      }
+
       if (isScrollSection(next)) {
         homeScrollRef.current?.scrollToSection(next, 'auto')
         setPage(next)
@@ -224,12 +286,14 @@ function App() {
             startAt={page}
             onSectionChange={onSectionChange}
             onCatalog={openCatalog}
+            onBackstory={openBackstory}
+            onHighlight={openHighlight}
             hero={
               <main className="hero">
                 <div className="hero-marquee hero-marquee--top" aria-label="Featured projects, scrolling top row">
                   <div className="hero-track hero-track--rtl">
-                    {homeTrackItems.map((item, index) => {
-                      const isDuplicate = index >= scrollingTrackProjectItems.length
+                    {homeTopMarquee.track.map((item, index) => {
+                      const isDuplicate = index >= homeTopMarquee.uniqueCount
 
                       return (
                         <HomeTrackCard
@@ -301,11 +365,8 @@ function App() {
                       >
                         WHO AM I?
                       </NavButton>
-                      <NavButton
-                        onClick={() => homeScrollRef.current?.scrollToSection('contact')}
-                        href="#/contact"
-                      >
-                        CONTACT
+                      <NavButton onClick={openCatalog} href="#/catalog">
+                        CATALOG
                       </NavButton>
                     </nav>
 
@@ -325,7 +386,11 @@ function App() {
                           {item.icon ? (
                             <img src={item.icon} alt="" />
                           ) : (
-                            <span className="social-btn-label">{item.label}</span>
+                            <span
+                              className={`social-btn-label ${item.label === '(CV)' ? 'social-btn-label--bold' : ''}`}
+                            >
+                              {item.label}
+                            </span>
                           )}
                         </a>
                       ))}
@@ -388,8 +453,8 @@ function App() {
 
                 <div className="hero-marquee hero-marquee--bottom" aria-label="Featured projects, scrolling bottom row">
                   <div className="hero-track hero-track--ltr">
-                    {homeTrackItems.map((item, index) => {
-                      const isDuplicate = index >= scrollingTrackProjectItems.length
+                    {homeBottomMarquee.track.map((item, index) => {
+                      const isDuplicate = index >= homeBottomMarquee.uniqueCount
 
                       return (
                         <HomeTrackCard
@@ -407,9 +472,33 @@ function App() {
               </main>
             }
           />
-        ) : (
-          <CatalogPage onBack={() => transitionTo('experience')} />
-        )}
+        ) : page === 'catalog' ? (
+          <>
+            <CatalogPage
+              onHome={() => transitionTo('home')}
+              onExperience={() => transitionTo('experience')}
+              onAbout={() => transitionTo('about')}
+            />
+            <SiteFooter />
+          </>
+        ) : page === 'backstory' ? (
+          <>
+            <BackstoryPage onBack={() => transitionTo('about')} />
+            <SiteFooter />
+          </>
+        ) : isHighlightId(page) ? (
+          <>
+            <HighlightProjectPage
+              highlight={getHighlightById(page)!}
+              onBack={() => transitionTo('experience')}
+              onHome={() => transitionTo('home')}
+              onExperience={() => transitionTo('experience')}
+              onAbout={() => transitionTo('about')}
+              onCatalog={openCatalog}
+            />
+            <SiteFooter />
+          </>
+        ) : null}
       </div>
     </div>
   )

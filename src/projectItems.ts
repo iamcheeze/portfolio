@@ -26,7 +26,10 @@ import stressThumbnail from './assets/stressThumbnail.png'
 import studentSorterThumbnail from './assets/studentSorterThumbnail.png'
 import theMiningMoleThumbnail from './assets/TheMiningMoleThumbnail.png'
 import EyeOfDemonThumbnail from './assets/EyeOfDemonThumbnail.png'
-import studioillinois from './assets/thestudiologonew.png'
+import LPVT from './assets/LPVT.png'
+import DCS from './assets/DCS.png'
+import SDOH from './assets/SDOH.png'
+import DEMOCRACYAR from './assets/DemocracyAR.png'
 import jumpCenter from './assets/jumpCenterLogo.png'
 import acuteRespiratoryDistressSimulationThumbnail from './assets/ARDSThumbnail.png'
 
@@ -137,7 +140,7 @@ export const projectItems: ProjectItem[] = [
   {
     label: 'Medical Simulation & AI Engineer',
     title: 'Lumbar Puncture Virtual Trainer',
-    image: jumpCenter,
+    image: LPVT,
     href: 'https://medicine.illinois.edu/innovation/jumpsimulationcenter',
     tag: 'Professional Project',
     includeInScrollingTracks: true,
@@ -225,7 +228,7 @@ export const projectItems: ProjectItem[] = [
   {
     label: 'XR + AI Software Developer',
     title: 'Social Determinants of Health',
-    image: studioillinois,
+    image: SDOH,
     href: 'https://games.illinois.edu/',
     tag: 'Professional Project',
     includeInScrollingTracks: true,
@@ -305,7 +308,7 @@ export const projectItems: ProjectItem[] = [
   {
     label: 'XR + AI Software Developer',
     title: 'Difficult Conversation Simulator',
-    image: studioillinois,
+    image: DCS,
     href: 'https://games.illinois.edu/',
     tag: 'Professional Project',
     includeInScrollingTracks: true,
@@ -313,7 +316,7 @@ export const projectItems: ProjectItem[] = [
   {
     label: 'AR Software Developer',
     title: 'Democracy AR',
-    image: studioillinois,
+    image: DEMOCRACYAR,
     href: 'https://games.illinois.edu/',
     tag: 'Professional Project',
     includeInScrollingTracks: true,

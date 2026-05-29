@@ -9,7 +9,6 @@ export function ContactPage({ onBack }: ContactPageDrops) {
 
   return (
 <main className="experience-page" aria-labelledby="experience-title">
-      <div className="experience-glow" aria-hidden="true" />
     <section className="experience-shell">
         <header className="experience-header">
           <h1 id="experience-title" className="experience-title">

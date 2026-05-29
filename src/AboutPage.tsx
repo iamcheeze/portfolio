@@ -1,22 +1,21 @@
 import { useEffect, useState } from 'react'
 import { NavButton } from './NavButton'
-import citrusBeatdownThumbnail from './assets/CitrusBeatdownThumbnail.png'
-import RedHighlight from './assets/RedHighlight.jpg'
-import MindlockMuseum2 from './assets/MindlockMuseum2.png'
+import rayan1 from './assets/Rayan1.png'
+import rayan2 from './assets/Rayan3.png'
+import rayan3 from './assets/RayanGhosh3.jpg'
 
 type AboutSectionProps = {
-  showBack?: boolean
-  onBack?: () => void
+  onLearnMore?: () => void
 }
 
-export function AboutSection({ showBack = false, onBack }: AboutSectionProps) {
-  const slideshowImages = [citrusBeatdownThumbnail, RedHighlight, MindlockMuseum2]
+export function AboutSection({ onLearnMore }: AboutSectionProps) {
+  const slideshowImages = [rayan1, rayan2, rayan3]
   const [activeSlide, setActiveSlide] = useState(0)
 
   useEffect(() => {
     const intervalId = window.setInterval(() => {
       setActiveSlide((current) => (current + 1) % slideshowImages.length)
-    }, 3200)
+    }, 6400)
 
     return () => window.clearInterval(intervalId)
   }, [slideshowImages.length])
@@ -28,7 +27,6 @@ export function AboutSection({ showBack = false, onBack }: AboutSectionProps) {
           WHO AM I?
         </h1>
       </header>
-
       <div className="about-grid">
         <article className="about-card about-photo-card" aria-label="Photo slideshow">
           {slideshowImages.map((image, index) => (
@@ -42,42 +40,71 @@ export function AboutSection({ showBack = false, onBack }: AboutSectionProps) {
           ))}
         </article>
 
-        <article className="about-card about-points-card" aria-label="About highlights">
-          <ul className="about-points-list">
-            <li>6+ years of experience in game development</li>
-            <li>Realtime simulation software development experience</li>
-            <li>Obsessed with making playful ideas feel smooth and memorable.</li>
-          </ul>
-        </article>
-
         <article className="about-card about-bio-card" aria-label="About bio">
           <p>
-            I am a developer and creative builder who loves turning ideas into polished interactive
-            experiences. I enjoy game development, UI engineering, and blending visual design with
-            reliable code. I am always exploring new tools and workflows that help me ship faster
-            while keeping quality high.
+          <b>Hi, I’m Rayan!</b> 
+          <br></br>
+          <br></br>
+          I’m from Fremont, CA and I'm currently pursuing a bachelor's degree in <b>Computer Science + Education</b> student at <b>UIUC</b>, specializing in human-computer interaction and AI engineering. 
+          <br></br>
+          <br></br>
+          My work focuses on bridging the gap between high-fidelity simulations and cutting-edge technology, creating deeply polished, interactive experiences that integrate real-time AI.
+          <br></br>
+          <br></br>
+          I love tackling complex technical challenges to build immersive applications that have a meaningful, real-world impact!
           </p>
         </article>
-      </div>
 
-      {showBack && onBack ? (
-        <nav className="nav-panel experience-nav" aria-label="About navigation">
-          <NavButton onClick={onBack}>BACK</NavButton>
-        </nav>
-      ) : null}
+        <div className="about-actions">
+          <span className="about-journey-hint about-journey-hint--left" aria-hidden="true">
+            <svg
+              className="about-journey-hint-arrow"
+              width="36"
+              height="20"
+              viewBox="0 0 36 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M4 10H20M20 4L26 10L20 16"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <NavButton onClick={onLearnMore} href="#/backstory">
+            MY JOURNEY
+          </NavButton>
+          <span className="about-journey-hint about-journey-hint--right" aria-hidden="true">
+            <svg
+              className="about-journey-hint-arrow"
+              width="36"
+              height="20"
+              viewBox="0 0 36 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M32 10H16M16 4L10 10L16 16"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+        </div>
+      </div>
     </section>
   )
 }
 
-type AboutPageProps = {
-  onBack: () => void
-}
-
-export function AboutPage({ onBack }: AboutPageProps) {
+export function AboutPage() {
   return (
     <main className="experience-page" aria-labelledby="about-title">
-      <div className="experience-glow" aria-hidden="true" />
-      <AboutSection showBack onBack={onBack} />
+      <AboutSection />
     </main>
   )
 }
