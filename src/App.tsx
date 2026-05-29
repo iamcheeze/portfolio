@@ -1,7 +1,13 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
 import { CatalogPage } from './CatalogPage'
 import { BackstoryPage } from './Backstory'
-import { HighlightProjectPage } from './HighlightProjectPage'
+import { AcuteRespiratoryDistressPage } from './AcuteRespiratoryDistressPage'
+import { CitrusBeatdownPage } from './CitrusBeatdownPage'
+import { DifficultConversationSimulatorPage } from './DifficultConversationSimulatorPage'
+import { LumbarPunctureVirtualTrainerPage } from './LumbarPunctureVirtualTrainerPage'
+import { MindlockMuseumPage } from './MindlockMuseumPage'
+import { PaintTheWorldRedPage } from './PaintTheWorldRedPage'
+import type { HighlightPageProps } from './highlightPageTypes'
 import { SiteFooter } from './SiteFooter'
 import { HomeScrollPage, type HomeScrollControls } from './HomeScrollPage'
 import {
@@ -25,6 +31,15 @@ type Page = 'home' | 'experience' | 'catalog' | 'about' | 'backstory' | Highligh
 type ScrollSection = 'home' | 'about' | 'experience'
 
 const TRANSITION_MS = 420
+
+const highlightPages: Record<HighlightId, ComponentType<HighlightPageProps>> = {
+  ards: AcuteRespiratoryDistressPage,
+  'lumbar-puncture': LumbarPunctureVirtualTrainerPage,
+  'difficult-conversation': DifficultConversationSimulatorPage,
+  mindlock: MindlockMuseumPage,
+  'citrus-beatdown': CitrusBeatdownPage,
+  'paint-the-world-red': PaintTheWorldRedPage,
+}
 
 const socialLinks = [
   {
@@ -483,19 +498,29 @@ function App() {
           </>
         ) : page === 'backstory' ? (
           <>
-            <BackstoryPage onBack={() => transitionTo('about')} />
-            <SiteFooter />
-          </>
-        ) : isHighlightId(page) ? (
-          <>
-            <HighlightProjectPage
-              highlight={getHighlightById(page)!}
-              onBack={() => transitionTo('experience')}
+            <BackstoryPage
+              onBack={() => transitionTo('about')}
               onHome={() => transitionTo('home')}
               onExperience={() => transitionTo('experience')}
               onAbout={() => transitionTo('about')}
               onCatalog={openCatalog}
             />
+            <SiteFooter />
+          </>
+        ) : isHighlightId(page) ? (
+          <>
+            {(() => {
+              const HighlightPage = highlightPages[page]
+              return (
+                <HighlightPage
+                  onBack={() => transitionTo('experience')}
+                  onHome={() => transitionTo('home')}
+                  onExperience={() => transitionTo('experience')}
+                  onAbout={() => transitionTo('about')}
+                  onCatalog={openCatalog}
+                />
+              )
+            })()}
             <SiteFooter />
           </>
         ) : null}

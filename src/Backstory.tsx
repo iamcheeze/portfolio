@@ -1,37 +1,663 @@
-import { NavButton } from './NavButton'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { ScrollNav } from './ScrollNav'
+import rayan1 from './assets/Rayan1.png'
+import rayan3 from './assets/Rayan3.png'
+import rayanForest from './assets/RayanGhosh3.jpg'
+import rayanSelfie from './assets/RayanSelfie.jpeg'
 
 type BackstoryPageProps = {
   onBack: () => void
+  onHome: () => void
+  onExperience: () => void
+  onAbout: () => void
+  onCatalog: () => void
 }
 
-export function BackstoryPage({ onBack }: BackstoryPageProps) {
+type BackstoryRow = {
+  hasImage: boolean
+  label: string
+  image?: { src: string; alt: string }
+  imageBottomSpace?: number
+  heading?: string
+  paragraphs: string[]
+}
+
+type Point = { x: number; y: number }
+
+type JourneyNodeRef = (element: HTMLElement | null) => void
+
+const BACKSTORY_ROWS: BackstoryRow[] = [
+  {
+    hasImage: true,
+    label: 'Introduction',
+    image: {
+      src: rayanSelfie,
+      alt: 'Hello! This is Rayan Ghosh. He should smile more when he takes selfies.',
+    },
+    imageBottomSpace: 0,
+    heading: 'Hello! My name is Rayan Ghosh...',
+    paragraphs: [
+      'and this is my journey so far!',
+    ],
+  },
+  {
+    hasImage: true,
+    label: 'Early roots',
+    image: {
+      src: rayan1,
+      alt: 'Rayan on a pedestrian bridge',
+    },
+    imageBottomSpace: 154,
+    heading: 'The year is 2020...',
+    paragraphs: [
+      'and the pandemic was in full effect. I had always been interested in learning how to create video games, but had never given it a try. So, with all the new free time I suddenly found myself with, I decided to give it a try!',
+      'I had no idea what I was about to begin would spark a life long passion.',
+    ],
+  },
+  {
+    hasImage: true,
+    label: 'First Game',
+    image: {
+      src: rayan3,
+      alt: 'Rayan in a desert landscape',
+    },
+    imageBottomSpace: 0,
+    heading: 'My first game…',
+    paragraphs: [
+      'was made in 48 hours during the GMTK Game Jam 2020, and it was terrible.',
+      'The game was barely playable, and I had somehow reworked the jumping mechanic into a flying simulation since I didn’t know how to check if the player was grounded!',
+      'But the response from the community introduced me to implementing user feedback from an early age, and it motivated me to continue perfecting my craft.',
+    ],
+  },
+  {
+    hasImage: true,
+    label: 'Growing Better at Games',
+    image: {
+      src: rayanForest,
+      alt: 'Rayan in a forest, seen from behind',
+    },
+    imageBottomSpace: 0,
+    heading: 'My creative and technical obsession...',
+    paragraphs: [
+      'with game development grew day by day, night by night, as I spent every spare moment outside of my studies making games.',
+      'To me, it is the ultimate art form: a beautiful harmony of art, programming, sound design, and music combined into one cohesive experience.',
+      'I constantly pushed my boundaries by setting small deadlines like making games for my friend’s birthdays and participating in game jams over the years. This cycle of creating and refining allowed me to master the craft and learn everything I needed to know about bringing interactive experiences to life. ',
+    ],
+  },
+]
+
+// (Node ids are `${label}-text` and `${label}-image`)
+
+function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState(() => {
+    if (typeof window === 'undefined') {
+      return false
+    }
+
+    return window.matchMedia(query).matches
+  })
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(query)
+    const onChange = () => setMatches(mediaQuery.matches)
+
+    onChange()
+    mediaQuery.addEventListener('change', onChange)
+    return () => mediaQuery.removeEventListener('change', onChange)
+  }, [query])
+
+  return matches
+}
+
+function getNodeGutterAnchor(
+  element: HTMLElement,
+  containerRect: DOMRect,
+  gutterX: number,
+): Point {
+  const rect = element.getBoundingClientRect()
+  const left = rect.left - containerRect.left
+  const right = rect.right - containerRect.left
+  const centerX = (left + right) / 2
+
+  return {
+    x: centerX <= gutterX ? right : left,
+    y: (rect.top + rect.bottom) / 2 - containerRect.top,
+  }
+}
+
+function getNodeCenterAnchor(element: HTMLElement, containerRect: DOMRect): Point {
+  const rect = element.getBoundingClientRect()
+  return {
+    x: (rect.left + rect.right) / 2 - containerRect.left,
+    y: (rect.top + rect.bottom) / 2 - containerRect.top,
+  }
+}
+
+function distanceSq(a: Point, b: Point) {
+  const dx = a.x - b.x
+  const dy = a.y - b.y
+  return dx * dx + dy * dy
+}
+
+function buildJourneyWaypoints(centers: Point[], containerWidth: number): Point[] {
+  if (centers.length <= 1) {
+    return centers
+  }
+
+  const gutterX = containerWidth * 0.5
+  const waypoints: Point[] = [centers[0]]
+
+  for (let index = 0; index < centers.length - 1; index += 1) {
+    const from = centers[index]
+    const to = centers[index + 1]
+    const crossesColumns =
+      (from.x < gutterX && to.x > gutterX) || (from.x > gutterX && to.x < gutterX)
+    const verticalSpan = to.y - from.y
+
+    if (crossesColumns) {
+      waypoints.push({
+        x: gutterX + (from.x < gutterX ? 28 : -28),
+        y: from.y + verticalSpan * 0.38,
+      })
+    } else if (verticalSpan > 36) {
+      const bowX = from.x < gutterX ? containerWidth * 0.44 : containerWidth * 0.56
+      waypoints.push({
+        x: bowX,
+        y: from.y + verticalSpan * 0.5,
+      })
+    }
+
+    waypoints.push(to)
+  }
+
+  return waypoints
+}
+
+function catmullRomPath(points: Point[], tension = 1.15): string {
+  if (points.length < 2) {
+    return ''
+  }
+
+  const format = (value: number) => value.toFixed(1)
+  let path = `M ${format(points[0].x)} ${format(points[0].y)}`
+
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const point0 = points[Math.max(index - 1, 0)]
+    const point1 = points[index]
+    const point2 = points[index + 1]
+    const point3 = points[Math.min(index + 2, points.length - 1)]
+
+    const control1 = {
+      x: point1.x + ((point2.x - point0.x) / 6) * tension,
+      y: point1.y + ((point2.y - point0.y) / 6) * tension,
+    }
+    const control2 = {
+      x: point2.x - ((point3.x - point1.x) / 6) * tension,
+      y: point2.y - ((point3.y - point1.y) / 6) * tension,
+    }
+
+    path += ` C ${format(control1.x)} ${format(control1.y)}, ${format(control2.x)} ${format(control2.y)}, ${format(point2.x)} ${format(point2.y)}`
+  }
+
+  return path
+}
+
+function buildJourneyPath(anchors: Point[], containerWidth: number): string {
+  const waypoints = buildJourneyWaypoints(anchors, containerWidth)
+  return catmullRomPath(waypoints)
+}
+
+function BackstoryJourneyArrow({
+  containerRef,
+  nodeMapRef,
+  layoutVersion,
+}: {
+  containerRef: React.RefObject<HTMLDivElement | null>
+  nodeMapRef: React.RefObject<Map<string, HTMLElement>>
+  layoutVersion: number
+}) {
+  const [path, setPath] = useState('')
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
+  const [visible, setVisible] = useState(false)
+  const [startPoint, setStartPoint] = useState<Point | null>(null)
+  const [pathLength, setPathLength] = useState<number | null>(null)
+  const mainPathRef = useRef<SVGPathElement | null>(null)
+  const glowPathRef = useRef<SVGPathElement | null>(null)
+
+  const journeyDelayMs = 600
+  const journeyDurationMs = 10000
+  const fadeInDurationMs = 1100
+
+  const updatePath = useCallback(() => {
+    const container = containerRef.current
+    const nodeMap = nodeMapRef.current
+    if (!container || !nodeMap) {
+      return
+    }
+
+    setVisible(true)
+    setStartPoint(null)
+
+    const containerRect = container.getBoundingClientRect()
+    const containerWidth = container.offsetWidth
+    const gutterX = containerWidth * 0.5
+    const useGutterAnchors = container.classList.contains('backstory-columns')
+
+    const nodes = Array.from(nodeMap.entries())
+      .map(([id, element]) => ({ id, element }))
+      .filter(({ element }) => container.contains(element))
+      .map(({ id, element }) => ({
+        id,
+        element,
+        anchor: useGutterAnchors
+          ? getNodeGutterAnchor(element, containerRect, gutterX)
+          : getNodeCenterAnchor(element, containerRect),
+      }))
+
+    if (nodes.length < 2) {
+      setPath('')
+      setStartPoint(null)
+      return
+    }
+
+    // Start from the top-most text card, then greedily connect to the closest next node.
+    const textNodes = nodes.filter((node) => node.id.endsWith('-text'))
+    const startNode = (textNodes.length ? textNodes : nodes).reduce((best, current) => {
+      if (!best) return current
+      if (current.anchor.y < best.anchor.y - 0.5) return current
+      if (Math.abs(current.anchor.y - best.anchor.y) <= 0.5 && current.anchor.x < best.anchor.x)
+        return current
+      return best
+    }, null as null | (typeof nodes)[number])
+
+    if (!startNode) {
+      setPath('')
+      setStartPoint(null)
+      return
+    }
+
+    const remaining = new Map(nodes.map((node) => [node.id, node]))
+    remaining.delete(startNode.id)
+    const orderedAnchors: Point[] = [startNode.anchor]
+    let current = startNode
+
+    while (remaining.size) {
+      let closest: (typeof nodes)[number] | null = null
+      let bestDist = Number.POSITIVE_INFINITY
+
+      for (const candidate of remaining.values()) {
+        const d = distanceSq(current.anchor, candidate.anchor)
+        if (d < bestDist) {
+          bestDist = d
+          closest = candidate
+        }
+      }
+
+      if (!closest) break
+      orderedAnchors.push(closest.anchor)
+      remaining.delete(closest.id)
+      current = closest
+    }
+
+    setDimensions({
+      width: containerWidth,
+      height: container.offsetHeight,
+    })
+    const newPath = buildJourneyPath(orderedAnchors, containerWidth)
+    setPath(newPath)
+    setStartPoint(orderedAnchors[0] ?? null)
+  }, [containerRef, nodeMapRef])
+
+  useLayoutEffect(() => {
+    updatePath()
+
+    const container = containerRef.current
+    if (!container) {
+      return undefined
+    }
+
+    const resizeObserver = new ResizeObserver(updatePath)
+    resizeObserver.observe(container)
+
+    const nodeMap = nodeMapRef.current
+    if (nodeMap) {
+      nodeMap.forEach((element) => resizeObserver.observe(element))
+    }
+
+    window.addEventListener('resize', updatePath)
+
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', updatePath)
+    }
+  }, [containerRef, nodeMapRef, updatePath, layoutVersion])
+
+  useLayoutEffect(() => {
+    if (!path) {
+      setPathLength(null)
+      return
+    }
+
+    const length = mainPathRef.current?.getTotalLength()
+    if (!length || !Number.isFinite(length)) {
+      setPathLength(null)
+      return
+    }
+
+    setPathLength(length)
+  }, [path, layoutVersion])
+
+  if (!visible || !path || dimensions.width === 0) {
+    return null
+  }
+
   return (
-    <main className="experience-page backstory-page" aria-labelledby="backstory-title">
-      <section className="experience-shell backstory-shell">
-        <header className="experience-header">
-          <h1 id="backstory-title" className="experience-title">
-            BACKSTORY
-          </h1>
-        </header>
+    <svg
+      className="backstory-journey-arrow"
+      width={dimensions.width}
+      height={dimensions.height}
+      viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
+      aria-hidden="true"
+      style={
+        {
+          ['--journey-delay-ms' as string]: `${journeyDelayMs + fadeInDurationMs}ms`,
+          ['--journey-duration-ms' as string]: `${journeyDurationMs}ms`,
+          ['--journey-dash' as string]: pathLength ? `${pathLength}` : '0',
+        } as React.CSSProperties
+      }
+    >
+      <defs>
+        <marker
+          id="backstory-journey-arrowhead"
+          markerWidth="20"
+          markerHeight="20"
+          refX="6"
+          refY="10"
+          orient="auto"
+          markerUnits="userSpaceOnUse"
+        >
+          <path d="M0,0 L20,10 L0,20 Z" className="backstory-journey-arrowhead" />
+        </marker>
+      </defs>
+      {startPoint ? (
+        <>
+          <circle className="backstory-journey-start-dot backstory-journey-start-dot--glow" cx={startPoint.x} cy={startPoint.y} r={14} />
+          <circle className="backstory-journey-start-dot" cx={startPoint.x} cy={startPoint.y} r={8} />
+        </>
+      ) : null}
+      <path
+        ref={glowPathRef}
+        className="backstory-journey-arrow-path backstory-journey-arrow-path--glow backstory-journey-arrow-path--animated"
+        d={path}
+      />
+      <path
+        ref={mainPathRef}
+        className="backstory-journey-arrow-path backstory-journey-arrow-path--animated"
+        d={path}
+        markerEnd="url(#backstory-journey-arrowhead)"
+      />
+    </svg>
+  )
+}
 
-        <div className="backstory-content">
-          <article className="about-card backstory-card" aria-label="Backstory placeholder">
-            <p>
-              COMING SOON...
-            </p>
-          </article>
+function BackstoryTextCard({
+  heading,
+  paragraphs,
+  label,
+  nodeRef,
+}: Pick<BackstoryRow, 'heading' | 'paragraphs' | 'label'> & { nodeRef?: JourneyNodeRef }) {
+  return (
+    <article
+      ref={nodeRef}
+      className="about-card backstory-text-card backstory-journey-node"
+      aria-label={label}
+    >
+      {heading ? <h2>{heading}</h2> : null}
+      {paragraphs.map((paragraph, index) => (
+        <p key={`${label}-${index}`}>{paragraph}</p>
+      ))}
+    </article>
+  )
+}
 
-          <article className="about-card backstory-card backstory-card--placeholder" aria-hidden="true">
-            <p>
-              Check out other sections to learn more!
-            </p>
-          </article>
-        </div>
+function BackstoryImageCard({
+  src,
+  alt,
+  label,
+  nodeRef,
+  onImageLoad,
+  bottomSpace,
+}: NonNullable<BackstoryRow['image']> & {
+  label: string
+  nodeRef?: JourneyNodeRef
+  onImageLoad?: () => void
+  bottomSpace?: number
+}) {
+  return (
+    <figure
+      ref={nodeRef}
+      className="about-card backstory-media-card backstory-journey-node"
+      aria-label={label}
+      style={bottomSpace ? { marginBottom: bottomSpace } : undefined}
+    >
+      <div className="backstory-media-frame">
+        <img src={src} alt={alt} loading="lazy" decoding="async" onLoad={onImageLoad} />
+        <figcaption className="backstory-media-caption">{alt}</figcaption>
+      </div>
+    </figure>
+  )
+}
 
-        <nav className="nav-panel experience-nav" aria-label="Backstory navigation">
-          <NavButton onClick={onBack}>BACK</NavButton>
-        </nav>
-      </section>
-    </main>
+function BackstoryPair({
+  row,
+  index,
+  registerNode,
+  onImageLoad,
+}: {
+  row: BackstoryRow
+  index: number
+  registerNode: (id: string) => JourneyNodeRef
+  onImageLoad?: () => void
+}) {
+  const text = (
+    <BackstoryTextCard
+      nodeRef={registerNode(`${row.label}-text`)}
+      label={row.label}
+      heading={row.heading}
+      paragraphs={row.paragraphs}
+    />
+  )
+
+  if (!row.hasImage || !row.image) {
+    return text
+  }
+
+  const image = (
+    <BackstoryImageCard
+      {...row.image}
+      nodeRef={registerNode(`${row.label}-image`)}
+      label={row.label}
+      onImageLoad={onImageLoad}
+      bottomSpace={row.imageBottomSpace}
+    />
+  )
+
+  return index % 2 === 0 ? (
+    <>
+      {image}
+      {text}
+    </>
+  ) : (
+    <>
+      {text}
+      {image}
+    </>
+  )
+}
+
+function renderPrimaryColumnItem(
+  row: BackstoryRow,
+  index: number,
+  registerNode: (id: string) => JourneyNodeRef,
+  onImageLoad?: () => void,
+) {
+  const imageOnLeft = index % 2 === 0
+
+  if (imageOnLeft && row.hasImage && row.image) {
+    return (
+      <BackstoryImageCard
+        key={`${row.label}-image`}
+        {...row.image}
+        nodeRef={registerNode(`${row.label}-image`)}
+        label={row.label}
+        onImageLoad={onImageLoad}
+        bottomSpace={row.imageBottomSpace}
+      />
+    )
+  }
+
+  if (!imageOnLeft) {
+    return (
+      <BackstoryTextCard
+        key={`${row.label}-text`}
+        nodeRef={registerNode(`${row.label}-text`)}
+        label={row.label}
+        heading={row.heading}
+        paragraphs={row.paragraphs}
+      />
+    )
+  }
+
+  return null
+}
+
+function renderSecondaryColumnItem(
+  row: BackstoryRow,
+  index: number,
+  registerNode: (id: string) => JourneyNodeRef,
+  onImageLoad?: () => void,
+) {
+  const imageOnLeft = index % 2 === 0
+
+  if (imageOnLeft) {
+    return (
+      <BackstoryTextCard
+        key={`${row.label}-text`}
+        nodeRef={registerNode(`${row.label}-text`)}
+        label={row.label}
+        heading={row.heading}
+        paragraphs={row.paragraphs}
+      />
+    )
+  }
+
+  if (row.hasImage && row.image) {
+    return (
+      <BackstoryImageCard
+        key={`${row.label}-image`}
+        {...row.image}
+        nodeRef={registerNode(`${row.label}-image`)}
+        label={row.label}
+        onImageLoad={onImageLoad}
+        bottomSpace={row.imageBottomSpace}
+      />
+    )
+  }
+
+  return null
+}
+
+export function BackstoryPage({
+  onHome,
+  onExperience,
+  onAbout,
+  onCatalog,
+}: BackstoryPageProps) {
+  const journeyRef = useRef<HTMLDivElement>(null)
+  const nodeMapRef = useRef<Map<string, HTMLElement>>(new Map())
+  const [layoutVersion, setLayoutVersion] = useState(0)
+  const showColumns = useMediaQuery('(min-width: 521px)')
+
+  const registerNode = useCallback((id: string): JourneyNodeRef => {
+    return (element) => {
+      if (element) {
+        nodeMapRef.current.set(id, element)
+      } else {
+        nodeMapRef.current.delete(id)
+      }
+    }
+  }, [])
+
+  const handleImageLoad = useCallback(() => {
+    setLayoutVersion((version) => version + 1)
+  }, [])
+
+  useEffect(() => {
+    nodeMapRef.current.clear()
+    setLayoutVersion((version) => version + 1)
+  }, [showColumns])
+
+  return (
+    <>
+      <ScrollNav
+        visible
+        onHome={onHome}
+        onExperience={onExperience}
+        onAbout={onAbout}
+        onCatalog={onCatalog}
+      />
+      <main
+        className="experience-page backstory-page backstory-page--with-nav"
+        aria-labelledby="backstory-title"
+      >
+        <section className="experience-shell backstory-shell">
+          <header className="experience-header">
+            <h1 id="backstory-title" className="experience-title">
+              MY JOURNEY
+            </h1>
+          </header>
+
+          <div className="backstory-content">
+            {showColumns ? (
+              <div ref={journeyRef} className="backstory-columns" aria-label="My journey">
+                <div className="backstory-column backstory-column--primary">
+                  {BACKSTORY_ROWS.map((row, index) =>
+                    renderPrimaryColumnItem(row, index, registerNode, handleImageLoad),
+                  )}
+                </div>
+                <div className="backstory-column backstory-column--secondary">
+                  {BACKSTORY_ROWS.map((row, index) =>
+                    renderSecondaryColumnItem(row, index, registerNode, handleImageLoad),
+                  )}
+                </div>
+                <BackstoryJourneyArrow
+                  containerRef={journeyRef}
+                  nodeMapRef={nodeMapRef}
+                  layoutVersion={layoutVersion}
+                />
+              </div>
+            ) : (
+              <div ref={journeyRef} className="backstory-stack" aria-label="My journey">
+                {BACKSTORY_ROWS.map((row, index) => (
+                  <section key={`${row.label}-stack`} className="backstory-stack-pair" aria-label={row.label}>
+                    <BackstoryPair
+                      row={row}
+                      index={index}
+                      registerNode={registerNode}
+                      onImageLoad={handleImageLoad}
+                    />
+                  </section>
+                ))}
+                <BackstoryJourneyArrow
+                  containerRef={journeyRef}
+                  nodeMapRef={nodeMapRef}
+                  layoutVersion={layoutVersion}
+                />
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
+    </>
   )
 }
