@@ -40,22 +40,27 @@ export function AboutSection({ onLearnMore }: AboutSectionProps) {
           ))}
         </article>
 
-        <article className="about-card about-bio-card" aria-label="About bio">
-          <p>
-          <b>Hi, I’m Rayan!</b> 
-          <br></br>
-          <br></br>
-          I’m from Fremont, CA and I'm currently pursuing a bachelor's degree in <b>Computer Science + Education</b> student at <b>UIUC</b>, specializing in human-computer interaction and AI engineering. 
-          <br></br>
-          <br></br>
-          My work focuses on bridging the gap between high-fidelity simulations and cutting-edge technology, creating deeply polished, interactive experiences that integrate real-time AI.
-          <br></br>
-          <br></br>
-          I love tackling complex technical challenges to build immersive applications that have a meaningful, real-world impact!
-          </p>
-        </article>
+        <div className="about-content-column">
+          <article className="about-card about-bio-card" aria-label="About bio">
+            <p>
+              <b>Hi, I’m Rayan!</b>
+              <br />
+              <br />
+              I’m from Fremont, CA and I'm currently pursuing a bachelor's degree in{' '}
+              <b>Computer Science + Education</b> student at <b>UIUC</b>, specializing in human-computer
+              interaction and AI engineering.
+              <br />
+              <br />
+              My work focuses on bridging the gap between high-fidelity simulations and cutting-edge
+              technology, creating deeply polished, interactive experiences that integrate real-time AI.
+              <br />
+              <br />
+              I love tackling complex technical challenges to build immersive applications that have a
+              meaningful, real-world impact!
+            </p>
+          </article>
 
-        <div className="about-actions">
+          <div className="about-actions">
           <span className="about-journey-hint about-journey-hint--left" aria-hidden="true">
             <svg
               className="about-journey-hint-arrow"
@@ -95,6 +100,7 @@ export function AboutSection({ onLearnMore }: AboutSectionProps) {
               />
             </svg>
           </span>
+          </div>
         </div>
       </div>
     </section>

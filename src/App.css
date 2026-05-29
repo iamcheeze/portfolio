@@ -1183,20 +1183,28 @@
   width: min(100%, 72rem);
   max-width: none;
   gap: clamp(1rem, 2.4vw, 1.45rem);
+  transform: none;
+  will-change: auto;
 }
 
 .about-grid {
   width: 100%;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: auto auto;
-  grid-template-areas:
-    'photo bio'
-    'photo actions';
+  grid-template-areas: 'photo content';
   align-items: stretch;
   gap: clamp(0.75rem, 1.8vw, 1rem);
   padding: 0 clamp(0.75rem, 2vw, 1.5rem);
   box-sizing: border-box;
+}
+
+.about-content-column {
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 1.8vw, 1rem);
+  min-width: 0;
+  min-height: 0;
 }
 
 .about-card {
@@ -1204,9 +1212,11 @@
   border: 1px solid var(--panel-border);
   border-radius: 28px;
   box-sizing: border-box;
-  background: rgba(45, 41, 170, 0.16);
-  backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
+  background: linear-gradient(
+    145deg,
+    rgba(68, 78, 177, 0.46),
+    rgba(45, 41, 170, 0.3)
+  );
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.22),
     inset 0 1px 1px rgba(255, 255, 255, 0.18);
@@ -1251,9 +1261,10 @@
 }
 
 .about-bio-card {
-  grid-area: bio;
+  flex: 1;
   display: flex;
   align-items: center;
+  min-height: 0;
   padding: clamp(1rem, 2.5vw, 1.6rem);
 }
 
@@ -1266,11 +1277,11 @@
 }
 
 .about-actions {
-  grid-area: actions;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: clamp(0.65rem, 2vw, 1.15rem);
+  flex-shrink: 0;
   padding-bottom: 0.25rem;
 }
 
@@ -1790,11 +1801,9 @@
   .about-grid {
     width: min(100vw, 28rem);
     grid-template-columns: 1fr;
-    grid-template-rows: auto;
     grid-template-areas:
       'photo'
-      'bio'
-      'actions';
+      'content';
     gap: 0.6rem;
     padding: 0 0.75rem;
   }
@@ -1946,7 +1955,8 @@
   .social-panel,
   .card-button,
   .experience-category-card,
-  .highlight-grid-item {
+  .highlight-grid-item,
+  .about-card {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     background: rgba(45, 41, 170, 0.35) !important;
