@@ -30,7 +30,6 @@ import LPVT from './assets/LPVT.png'
 import DCS from './assets/DCS.png'
 import SDOH from './assets/SDOH.png'
 import DEMOCRACYAR from './assets/DemocracyAR.png'
-import jumpCenter from './assets/jumpCenterLogo.png'
 import acuteRespiratoryDistressSimulationThumbnail from './assets/ARDSThumbnail.png'
 
 export type ProjectItem = {
