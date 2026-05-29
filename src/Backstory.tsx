@@ -453,11 +453,13 @@ function BackstoryPair({
   index,
   registerNode,
   onImageLoad,
+  preserveImageBottomSpace = false,
 }: {
   row: BackstoryRow
   index: number
   registerNode: (id: string) => JourneyNodeRef
   onImageLoad?: () => void
+  preserveImageBottomSpace?: boolean
 }) {
   const text = (
     <BackstoryTextCard
@@ -478,7 +480,7 @@ function BackstoryPair({
       nodeRef={registerNode(`${row.label}-image`)}
       label={row.label}
       onImageLoad={onImageLoad}
-      bottomSpace={row.imageBottomSpace}
+      bottomSpace={preserveImageBottomSpace ? row.imageBottomSpace : undefined}
     />
   )
 
@@ -576,7 +578,7 @@ export function BackstoryPage({
   const journeyRef = useRef<HTMLDivElement>(null)
   const nodeMapRef = useRef<Map<string, HTMLElement>>(new Map())
   const [layoutVersion, setLayoutVersion] = useState(0)
-  const showColumns = useMediaQuery('(min-width: 521px)')
+  const showColumns = useMediaQuery('(min-width: 760px)')
 
   const registerNode = useCallback((id: string): JourneyNodeRef => {
     return (element) => {
@@ -645,6 +647,7 @@ export function BackstoryPage({
                       index={index}
                       registerNode={registerNode}
                       onImageLoad={handleImageLoad}
+                      preserveImageBottomSpace={false}
                     />
                   </section>
                 ))}

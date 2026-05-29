@@ -1,7 +1,5 @@
-import { CardButton } from './CardButton'
 import { NavButton } from './NavButton'
 import { highlightsData, type HighlightId } from './highlightsData'
-import { scrollingTrackProjectItems } from './projectItems'
 
 type ExperiencePageProps = {
   onBack: () => void
@@ -10,7 +8,6 @@ type ExperiencePageProps = {
 }
 
 export function ExperiencePage({ onCatalog, onHighlight }: ExperiencePageProps) {
-  const scrollingItems = [...scrollingTrackProjectItems, ...scrollingTrackProjectItems]
 
   return (
     <main className="experience-page" aria-labelledby="experience-title">
