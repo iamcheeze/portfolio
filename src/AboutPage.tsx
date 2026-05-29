@@ -47,11 +47,11 @@ export function AboutSection({ onLearnMore }: AboutSectionProps) {
               <br />
               <br />
               I’m from Fremont, CA and I'm currently pursuing a bachelor's degree in{' '}
-              <b>Computer Science + Education</b> student at <b>UIUC</b>, specializing in human-computer
+              Computer Science + Education at <b>the University of Illinois at Urbana-Champaign</b>, specializing in human-computer
               interaction and AI engineering.
               <br />
               <br />
-              My work focuses on bridging the gap between high-fidelity simulations and cutting-edge
+              With over <b>6+ years of experience in Unity/C#</b>, my work focuses on bridging the gap between high-fidelity simulations and cutting-edge
               technology, creating deeply polished, interactive experiences that integrate real-time AI.
               <br />
               <br />
