@@ -6,6 +6,8 @@ import linkedinIcon from './assets/linkedinIcon.svg'
 const RESUME_URL =
   'https://drive.google.com/file/d/1XjYry0P2eFwgLl42o_59LYiaFuc3QeTJ/view'
 
+const cheezeIconSrc = `${import.meta.env.BASE_URL}cheezeIcon.svg`
+
 const scrollNavSocialLinks = [
   {
     label: 'Youtube',
@@ -150,7 +152,7 @@ export function ScrollNav({
       <div className="scroll-nav-bar">
         <div className="scroll-nav-brand">
           <button type="button" className="scroll-nav-name" onClick={onHome}>
-            <img className="scroll-nav-logo" src="/cheezeIcon.svg" alt="" aria-hidden="true" />
+            <img className="scroll-nav-logo" src={cheezeIconSrc} alt="" aria-hidden="true" />
             <span className="scroll-nav-label scroll-nav-label--full">RAYAN GHOSH</span>
             <span className="scroll-nav-label scroll-nav-label--short" aria-hidden="true">
               RAYAN G.

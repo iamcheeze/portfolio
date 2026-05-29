@@ -1990,12 +1990,8 @@
   }
 
   .scroll-nav-name {
-    gap: 0;
+    gap: 0.35rem;
     font-size: clamp(0.68rem, 2.4vw, 0.82rem);
-  }
-
-  .scroll-nav-logo {
-    display: none;
   }
 
   .scroll-nav-label--full {
