@@ -34,6 +34,9 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          # Custom domain (rayanghosh.com) serves from site root, not /portfolio/.
+          VITE_BASE: /
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
