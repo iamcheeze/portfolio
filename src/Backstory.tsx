@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { ScrollNav } from './ScrollNav'
-import rayan1 from './assets/Rayan1.png'
 import rayan3 from './assets/Rayan3.png'
 import rayanForest from './assets/RayanGhosh3.jpg'
 import rayanSelfie from './assets/RayanSelfie.jpeg'
+import rayanArt from './assets/art2.jpg'
+import gamedev from './assets/AHS Game Dev.png'
+import interview from './assets/EagleQuest.png'
 
 type BackstoryPageProps = {
   onBack: () => void
@@ -44,8 +46,8 @@ const BACKSTORY_ROWS: BackstoryRow[] = [
     hasImage: true,
     label: 'Early roots',
     image: {
-      src: rayan1,
-      alt: 'Rayan on a pedestrian bridge',
+      src: rayanArt,
+      alt: '',
     },
     imageBottomSpace: 154,
     heading: 'The year is 2020...',
@@ -59,7 +61,7 @@ const BACKSTORY_ROWS: BackstoryRow[] = [
     label: 'First Game',
     image: {
       src: rayan3,
-      alt: 'Rayan in a desert landscape',
+      alt: '',
     },
     imageBottomSpace: 0,
     heading: 'My first game…',
@@ -74,7 +76,7 @@ const BACKSTORY_ROWS: BackstoryRow[] = [
     label: 'Growing Better at Games',
     image: {
       src: rayanForest,
-      alt: 'Rayan in a forest, seen from behind',
+      alt: '',
     },
     imageBottomSpace: 0,
     heading: 'My creative and technical obsession...',
@@ -82,6 +84,33 @@ const BACKSTORY_ROWS: BackstoryRow[] = [
       'with game development grew day by day, night by night, as I spent every spare moment outside of my studies making games.',
       'To me, it is the ultimate art form: a beautiful harmony of art, programming, sound design, and music combined into one cohesive experience.',
       'I constantly pushed my boundaries by setting small deadlines like making games for my friend’s birthdays and participating in game jams over the years. This cycle of creating and refining allowed me to master the craft and learn everything I needed to know about bringing interactive experiences to life. ',
+    ],
+  },
+  {
+    hasImage: true,
+    label: 'Growing Better at Games',
+    image: {
+      src: gamedev,
+      alt: 'Our club is still going strong today, with over 150 members!',
+    },
+    imageBottomSpace: 0,
+    heading: 'Game development became more than just a hobby…',
+    paragraphs: [
+      'It became my creative outlet into the world, a medium for which to express my ideas.', 
+      'I wanted my peers to understand how liberating it felt to create interactive experiences, so I founded a game development club at my school. I held meetings weekly covering the basics of the Unity Game Engine and the fundamentals of C#, giving students at my school the tools to realize their own creative visions.',
+      'Together, we created 7 unique games over the span of 3 years.'],
+  },
+  {
+    hasImage: true,
+    label: 'Growing Better at Games',
+    image: {
+      src: interview,
+      alt: 'Picture from an interview I did with my school\'s social media team.',
+    },
+    imageBottomSpace: 0,
+    heading: 'After founding my club...',
+    paragraphs: [
+      'I realized my passion for teaching. This lead me to become an instructor at multiple computer science organizations in my community. I also joined Instilt, an NGO focused on tutoring English to underprivileged children in around the world. Teaching at Instilt was such a fulfilling experience, and it made me realize that I wanted to pursue education through technology.',
     ],
   },
 ]
