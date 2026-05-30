@@ -110,7 +110,7 @@ const BACKSTORY_ROWS: BackstoryRow[] = [
     imageBottomSpace: 0,
     heading: 'After founding my club...',
     paragraphs: [
-      'I realized my passion for teaching. This lead me to become an instructor at multiple computer science organizations in my community. I also joined Instilt, an NGO focused on tutoring English to underprivileged children in around the world. Teaching at Instilt was such a fulfilling experience, and it made me realize that I wanted to pursue education through technology.',
+      'I realized my passion for teaching. This lead me to become an instructor at multiple computer science organizations in my community. I also joined Instilt, an NGO focused on tutoring English to underprivileged children in around the world. Teaching at Instilt was an extremely fulfilling experience, and it made me realize that I wanted to pursue education through technology.',
     ],
   },
 ]
