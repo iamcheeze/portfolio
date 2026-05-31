@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ComponentType } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentType,
+} from 'react'
 import { CatalogPage } from './CatalogPage'
 import { BackstoryPage } from './Backstory'
 import { AcuteRespiratoryDistressPage } from './AcuteRespiratoryDistressPage'
@@ -176,12 +184,19 @@ function App() {
   }, [isTransitioning, page])
 
   const openCatalog = useCallback(() => {
+    window.scrollTo(0, 0)
     if (window.location.hash !== '#/catalog') {
       window.history.pushState(null, '', '#/catalog')
     }
     setIsTransitioning(false)
     setPage('catalog')
   }, [])
+
+  useLayoutEffect(() => {
+    if (!isScrollSection(page)) {
+      window.scrollTo(0, 0)
+    }
+  }, [page])
 
   const openBackstory = useCallback(() => {
     if (window.location.hash !== '#/backstory') {
