@@ -24,6 +24,7 @@ import {
   isScrollSection,
   migrateLegacyHashRoute,
   pageToPath,
+  scrollPageToTop,
   sectionToPath,
   type Page,
   type ScrollSection,
@@ -96,10 +97,7 @@ function buildMarqueeTrack(items: ProjectItem[]) {
 function App() {
   const appRef = useRef<HTMLDivElement>(null)
   const homeScrollRef = useRef<HomeScrollControls>(null)
-  const [page, setPage] = useState<Page>(() => {
-    migrateLegacyHashRoute()
-    return getPageFromPath()
-  })
+  const [page, setPage] = useState<Page>(() => getPageFromPath())
   const [isTransitioning, setIsTransitioning] = useState(false)
   const homeTopMarquee = useMemo(() => buildMarqueeTrack(scrollingTrackProjectItems), [])
   const homeBottomMarquee = useMemo(() => buildMarqueeTrack(scrollingTrackProjectItems), [])
@@ -138,7 +136,7 @@ function App() {
   }, [isTransitioning, page])
 
   const openCatalog = useCallback(() => {
-    window.scrollTo(0, 0)
+    scrollPageToTop()
     const catalogPath = pageToPath('catalog')
     if (window.location.pathname !== catalogPath) {
       window.history.pushState(null, '', catalogPath)
@@ -149,7 +147,7 @@ function App() {
 
   useLayoutEffect(() => {
     if (!isScrollSection(page)) {
-      window.scrollTo(0, 0)
+      scrollPageToTop()
     }
   }, [page])
 
@@ -218,43 +216,37 @@ function App() {
   }, [])
 
   /**
-   * Listen for browser back/forward and manual URL edits.
+   * Listen for browser back/forward, legacy hash links, and manual URL edits.
    */
   useEffect(() => {
-    const onLocationChange = () => {
-      migrateLegacyHashRoute()
+    const syncFromLocation = () => {
+      const migrated = migrateLegacyHashRoute()
       const next = getPageFromPath()
 
-      if (next === 'catalog') {
-        setIsTransitioning(false)
-        setPage('catalog')
-        return
-      }
-
-      if (next === 'backstory') {
-        setIsTransitioning(false)
-        setPage('backstory')
-        return
-      }
-
-      if (isHighlightId(next)) {
+      if (next === 'catalog' || next === 'backstory' || isHighlightId(next)) {
         setIsTransitioning(false)
         setPage(next)
+        scrollPageToTop()
         return
       }
 
       if (isScrollSection(next)) {
         homeScrollRef.current?.scrollToSection(next, 'auto')
         setPage(next)
+        if (migrated) {
+          scrollPageToTop()
+        }
         return
       }
 
       transitionTo(next, false)
     }
 
-    window.addEventListener('popstate', onLocationChange)
+    window.addEventListener('popstate', syncFromLocation)
+    window.addEventListener('hashchange', syncFromLocation)
     return () => {
-      window.removeEventListener('popstate', onLocationChange)
+      window.removeEventListener('popstate', syncFromLocation)
+      window.removeEventListener('hashchange', syncFromLocation)
     }
   }, [transitionTo])
 

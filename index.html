@@ -11,6 +11,19 @@
       rel="stylesheet"
     />
     <title>Rayan Ghosh's Portfolio</title>
+    <script>
+      ;(function () {
+        if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+        var hash = location.hash
+        if (hash.indexOf('#/') === 0) {
+          var path = hash.slice(1)
+          history.replaceState(null, '', path)
+          if (path !== '/' && path !== '/about' && path !== '/experience') {
+            scrollTo(0, 0)
+          }
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

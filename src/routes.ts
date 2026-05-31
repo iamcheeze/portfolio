@@ -96,6 +96,13 @@ export function pageToPath(page: Page): string {
   }
 }
 
+/** Scroll the document to the top (covers body + root element scrolling). */
+export function scrollPageToTop() {
+  window.scrollTo(0, 0)
+  document.documentElement.scrollTop = 0
+  document.body.scrollTop = 0
+}
+
 /** Redirect legacy `#/…` bookmarks to clean paths. */
 export function migrateLegacyHashRoute(): boolean {
   const { hash } = window.location
@@ -104,4 +111,19 @@ export function migrateLegacyHashRoute(): boolean {
   const legacyPath = normalizePath(hash.slice(1))
   window.history.replaceState(null, '', routePath(legacyPath))
   return true
+}
+
+/** Run before React mounts so the first render sees the clean URL. */
+export function bootstrapRouting() {
+  if ('scrollRestoration' in window.history) {
+    window.history.scrollRestoration = 'manual'
+  }
+
+  const migrated = migrateLegacyHashRoute()
+  if (!migrated) return
+
+  const page = getPageFromPath()
+  if (!isScrollSection(page)) {
+    scrollPageToTop()
+  }
 }
