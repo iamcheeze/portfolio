@@ -2130,7 +2130,7 @@
   .hero-mini-marquee {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
   }
 
   .hero-mini-track-card {
