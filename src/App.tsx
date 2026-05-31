@@ -16,6 +16,7 @@ import {
   isHighlightId,
   type HighlightId,
 } from './highlightsData'
+import { HeroMiniScrollingTrack } from './HeroMiniScrollingTrack'
 import { HomeTrackCard } from './HomeTrackCard'
 import { NavButton } from './NavButton'
 import { SceneBackground } from './SceneBackground'
@@ -324,6 +325,12 @@ function App() {
                   </div>
                 </div>
 
+                <HeroMiniScrollingTrack
+                  className="hero-mini-marquee--top"
+                  track={homeTopMarquee.track}
+                  uniqueCount={homeTopMarquee.uniqueCount}
+                />
+
                 <div className="hero-core">
                   <div className="hero-glow" aria-hidden="true" />
 
@@ -465,6 +472,13 @@ function App() {
                     </svg>
                   </button>
                 </div>
+
+                <HeroMiniScrollingTrack
+                  className="hero-mini-marquee--bottom"
+                  track={homeBottomMarquee.track}
+                  uniqueCount={homeBottomMarquee.uniqueCount}
+                  direction="ltr"
+                />
 
                 <div className="hero-marquee hero-marquee--bottom" aria-label="Featured projects, scrolling bottom row">
                   <div className="hero-track hero-track--ltr">

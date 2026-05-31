@@ -57,6 +57,30 @@ export const projectTags: ProjectTag[] = [
 
 export const projectItems: ProjectItem[] = [
   {
+    label: 'Medical Simulation & AI Engineer',
+    title: 'Accute Respiratory Distress Simulation',
+    image: acuteRespiratoryDistressSimulationThumbnail,
+    href: 'https://medicine.illinois.edu/innovation/jumpsimulationcenter',
+    tag: 'Professional Project',
+    includeInScrollingTracks: true,
+  },
+  {
+    label: 'Medical Simulation & AI Engineer',
+    title: 'Lumbar Puncture Virtual Trainer',
+    image: LPVT,
+    href: 'https://medicine.illinois.edu/innovation/jumpsimulationcenter',
+    tag: 'Professional Project',
+    includeInScrollingTracks: true,
+  },
+  {
+    label: 'XR + AI Software Developer',
+    title: 'Difficult Conversation Simulator',
+    image: DCS,
+    href: 'https://games.illinois.edu/',
+    tag: 'Professional Project',
+    includeInScrollingTracks: true,
+  },
+  {
     label: 'Project Director',
     title: 'MINDLOCK MUSEUM',
     image: mindlockThumbnail,
@@ -73,19 +97,19 @@ export const projectItems: ProjectItem[] = [
     includeInScrollingTracks: true,
   },
   {
-    label: 'Medical Simulation & AI Engineer',
-    title: 'Accute Respiratory Distress Simulation',
-    image: acuteRespiratoryDistressSimulationThumbnail,
-    href: 'https://medicine.illinois.edu/innovation/jumpsimulationcenter',
-    tag: 'Professional Project',
-    includeInScrollingTracks: true,
-  },
-  {
     label: 'Personal Project',
     title: 'PAINT THE WORLD RED',
     image: redThumbnail,
     href: 'https://www.instagram.com/ptwredgame/',
     tag: 'Personal Project',
+    includeInScrollingTracks: true,
+  },
+  {
+    label: 'XR + AI Software Developer',
+    title: 'Social Determinants of Health',
+    image: SDOH,
+    href: 'https://games.illinois.edu/',
+    tag: 'Professional Project',
     includeInScrollingTracks: true,
   },
   {
@@ -134,14 +158,6 @@ export const projectItems: ProjectItem[] = [
     image: scalingSomeScalesThumbnail,
     href: 'https://iamcheeze.itch.io/scaling-some-scales',
     tag: 'Hackathon / Game Jam Entry',
-    includeInScrollingTracks: true,
-  },
-  {
-    label: 'Medical Simulation & AI Engineer',
-    title: 'Lumbar Puncture Virtual Trainer',
-    image: LPVT,
-    href: 'https://medicine.illinois.edu/innovation/jumpsimulationcenter',
-    tag: 'Professional Project',
     includeInScrollingTracks: true,
   },
   {
@@ -225,14 +241,6 @@ export const projectItems: ProjectItem[] = [
     includeInScrollingTracks: false,
   },
   {
-    label: 'XR + AI Software Developer',
-    title: 'Social Determinants of Health',
-    image: SDOH,
-    href: 'https://games.illinois.edu/',
-    tag: 'Professional Project',
-    includeInScrollingTracks: true,
-  },
-  {
     label: 'Game Jam Entry',
     title: 'STRESS',
     image: stressThumbnail,
@@ -305,20 +313,12 @@ export const projectItems: ProjectItem[] = [
     includeInScrollingTracks: false,
   },
   {
-    label: 'XR + AI Software Developer',
-    title: 'Difficult Conversation Simulator',
-    image: DCS,
-    href: 'https://games.illinois.edu/',
-    tag: 'Professional Project',
-    includeInScrollingTracks: true,
-  },
-  {
     label: 'AR Software Developer',
     title: 'Democracy AR',
     image: DEMOCRACYAR,
     href: 'https://games.illinois.edu/',
     tag: 'Professional Project',
-    includeInScrollingTracks: true,
+    includeInScrollingTracks: false,
   },
 ]
 

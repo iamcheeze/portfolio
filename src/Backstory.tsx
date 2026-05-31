@@ -6,6 +6,15 @@ import rayanSelfie from './assets/RayanSelfie.jpeg'
 import rayanArt from './assets/art2.jpg'
 import gamedev from './assets/AHS Game Dev.png'
 import interview from './assets/EagleQuest.png'
+import UIUC from './assets/UIUC.jpeg'
+import mindlockPresentation from './assets/m2.png'
+import jumpCenter from './assets/MedicalSimulationDesign.jpg'
+
+import { NavButton } from './NavButton'
+
+const cheezeIconSrc = `${import.meta.env.BASE_URL}cheezeIcon.svg`
+
+type BackstoryParagraph = string | 'cheeze-icon'
 
 type BackstoryPageProps = {
   onBack: () => void
@@ -21,7 +30,7 @@ type BackstoryRow = {
   image?: { src: string; alt: string }
   imageBottomSpace?: number
   heading?: string
-  paragraphs: string[]
+  paragraphs: BackstoryParagraph[]
 }
 
 type Point = { x: number; y: number }
@@ -34,12 +43,15 @@ const BACKSTORY_ROWS: BackstoryRow[] = [
     label: 'Introduction',
     image: {
       src: rayanSelfie,
-      alt: 'Hello! This is Rayan Ghosh. He should smile more when he takes selfies.',
+      alt: '',
     },
     imageBottomSpace: 0,
     heading: 'Hello! My name is Rayan Ghosh...',
     paragraphs: [
-      'and this is my journey so far!',
+      'and this my story so far!',
+      'Creating interactive software has always been a life long passion of mine, so I\'d like to start from the very beginning.',
+      'Thank you for visiting my website!',
+      'cheeze-icon',
     ],
   },
   {
@@ -49,7 +61,7 @@ const BACKSTORY_ROWS: BackstoryRow[] = [
       src: rayanArt,
       alt: '',
     },
-    imageBottomSpace: 154,
+    imageBottomSpace: 0,
     heading: 'The year is 2020...',
     paragraphs: [
       'and the pandemic was in full effect. I had always been interested in learning how to create video games, but had never given it a try. So, with all the new free time I suddenly found myself with, I decided to give it a try!',
@@ -83,7 +95,7 @@ const BACKSTORY_ROWS: BackstoryRow[] = [
     paragraphs: [
       'with game development grew day by day, night by night, as I spent every spare moment outside of my studies making games.',
       'To me, it is the ultimate art form: a beautiful harmony of art, programming, sound design, and music combined into one cohesive experience.',
-      'I constantly pushed my boundaries by setting small deadlines like making games for my friend’s birthdays and participating in game jams over the years. This cycle of creating and refining allowed me to master the craft and learn everything I needed to know about bringing interactive experiences to life. ',
+      'I constantly pushed my boundaries by setting small deadlines like making games for my friend’s birthdays and participating in game jams over the years. This cycle of creating and refining allowed me to master my craft and learn everything I needed to know about bringing interactive experiences to life. ',
     ],
   },
   {
@@ -110,12 +122,61 @@ const BACKSTORY_ROWS: BackstoryRow[] = [
     imageBottomSpace: 0,
     heading: 'After founding my club...',
     paragraphs: [
-      'I realized my passion for teaching. This lead me to become an instructor at multiple computer science organizations in my community. I also joined Instilt, an NGO focused on tutoring English to underprivileged children in around the world. Teaching at Instilt was an extremely fulfilling experience, and it made me realize that I wanted to pursue education through technology.',
+      'I realized my passion for teaching. This lead me to become an instructor at the CS First Club and the Coding Tomorrow Initiative in my community. I also joined Instilt, an NGO focused on tutoring English to underprivileged children in around the world. Teaching at Instilt was an extremely fulfilling experience, and it made me realize that I wanted to pursue education through technology.',
+    ],
+  },
+  {
+    hasImage: true,
+    label: 'Growing Better at Games',
+    image: {
+      src: UIUC,
+      alt: 'Picture with a statue outside the Main Library at UIUC.',
+    },
+    imageBottomSpace: 0,
+    heading: 'Which was why...',
+    paragraphs: [
+      'I decided to major in Computer Science + Education at the University of Illinois at Urbana-Champaign! ',
+      'It combines my greatest passions, as it allows me to take courses which discuss the intersection of the two fields. What I discovered was that my expertise in game development was actually fundamental in designing educational software.',
+      'Truly effective learning tools need to be fun and engaging, and utilize gamification techniques to keep students engaged and motivated.',
+      'But my pursuits at UIUC go far beyond just my regular coursework.'
+    ],
+  },
+  {
+    hasImage: true,
+    label: 'Growing Better at Games',
+    image: {
+      src: mindlockPresentation,
+      alt: 'Presenting my team\'s project at the GameBuilders Final Showcase!',
+    },
+    imageBottomSpace: 0,
+    heading: 'Utilizing my experience...',
+    paragraphs: [
+      'in game development, I led two game development teams with ACM GameBuilders!' ,
+      'Collaborating with my teammates while integrating a game development curriculum into our development cycle was a challenging yet rewarding experience.',
+      'I learned to balance my time between my coursework and my projects, and how to effectively communicate with my teammates to ensure our games were effectively polished and ready for our final showcases.',
+    ],
+  },
+  {
+    hasImage: true,
+    label: 'Growing Better at Games',
+    image: {
+      src: jumpCenter,
+      alt: 'Working on the Accurate Respiratory Distress Simulation at the Jump Center!',
+    },
+    imageBottomSpace: 0,
+    heading: 'I also learned that...',
+    paragraphs: [
+      'my game development skills could actually be applied to solve real world problems!',
+      'I currently work at the stu/dio: a game development organization on campus that works with sponsors to release high fidelity simulations and XR experiences tailored toward education!',
+      'I also work at the Jump Simulation Center, which works directly with the Carle College of Medicine to create high fidelity simulations for medical students to practice with!',
+      'Developing these simulations have taught me so much about the importance of user feedback and iterative development, as well as developing XR applications integrated with AI systems.',
+      'Thank you for reading my story so far!',
+      'Feel free to explore my project catalog to try out some of my projects!',
     ],
   },
 ]
 
-// (Node ids are `${label}-text` and `${label}-image`)
+// Node ids are `${index}-text` and `${index}-image`
 
 function useMediaQuery(query: string) {
   const [matches, setMatches] = useState(() => {
@@ -138,7 +199,7 @@ function useMediaQuery(query: string) {
   return matches
 }
 
-function getNodeGutterAnchor(
+function getGutterEdgeAnchor(
   element: HTMLElement,
   containerRect: DOMRect,
   gutterX: number,
@@ -154,57 +215,64 @@ function getNodeGutterAnchor(
   }
 }
 
-function getNodeCenterAnchor(element: HTMLElement, containerRect: DOMRect): Point {
-  const rect = element.getBoundingClientRect()
+function getRowGutterPoint(
+  rowIndex: number,
+  nodeMap: Map<string, HTMLElement>,
+  container: HTMLElement,
+  containerRect: DOMRect,
+  gutterX: number,
+): Point | null {
+  const elements = [`${rowIndex}-image`, `${rowIndex}-text`]
+    .map((id) => nodeMap.get(id))
+    .filter((element): element is HTMLElement => !!element && container.contains(element))
+
+  if (!elements.length) {
+    return null
+  }
+
+  const rects = elements.map((element) => element.getBoundingClientRect())
+  const top = Math.min(...rects.map((rect) => rect.top)) - containerRect.top
+  const bottom = Math.max(...rects.map((rect) => rect.bottom)) - containerRect.top
+
   return {
-    x: (rect.left + rect.right) / 2 - containerRect.left,
-    y: (rect.top + rect.bottom) / 2 - containerRect.top,
+    x: gutterX + (rowIndex % 2 === 0 ? -26 : 26),
+    y: (top + bottom) / 2,
   }
 }
 
-function distanceSq(a: Point, b: Point) {
-  const dx = a.x - b.x
-  const dy = a.y - b.y
-  return dx * dx + dy * dy
-}
+function buildTimelineAnchors(
+  nodeMap: Map<string, HTMLElement>,
+  container: HTMLElement,
+  containerRect: DOMRect,
+  gutterX: number,
+): Point[] {
+  const anchors: Point[] = []
 
-function buildJourneyWaypoints(centers: Point[], containerWidth: number): Point[] {
-  if (centers.length <= 1) {
-    return centers
+  const firstText = nodeMap.get('0-text')
+  if (firstText && container.contains(firstText)) {
+    anchors.push(getGutterEdgeAnchor(firstText, containerRect, gutterX))
   }
 
-  const gutterX = containerWidth * 0.5
-  const waypoints: Point[] = [centers[0]]
+  const introRowPoint = getRowGutterPoint(0, nodeMap, container, containerRect, gutterX)
+  if (introRowPoint) {
+    anchors.push(introRowPoint)
+  }
 
-  for (let index = 0; index < centers.length - 1; index += 1) {
-    const from = centers[index]
-    const to = centers[index + 1]
-    const crossesColumns =
-      (from.x < gutterX && to.x > gutterX) || (from.x > gutterX && to.x < gutterX)
-    const verticalSpan = to.y - from.y
-
-    if (crossesColumns) {
-      waypoints.push({
-        x: gutterX + (from.x < gutterX ? 28 : -28),
-        y: from.y + verticalSpan * 0.38,
-      })
-    } else if (verticalSpan > 36) {
-      const bowX = from.x < gutterX ? containerWidth * 0.44 : containerWidth * 0.56
-      waypoints.push({
-        x: bowX,
-        y: from.y + verticalSpan * 0.5,
-      })
+  for (let rowIndex = 1; rowIndex < BACKSTORY_ROWS.length; rowIndex += 1) {
+    const rowPoint = getRowGutterPoint(rowIndex, nodeMap, container, containerRect, gutterX)
+    if (rowPoint) {
+      anchors.push(rowPoint)
     }
-
-    waypoints.push(to)
   }
 
-  return waypoints
+  return anchors
 }
 
-function catmullRomPath(points: Point[], tension = 1.15): string {
+function catmullRomPath(points: Point[], tension = 0.72): string {
   if (points.length < 2) {
-    return ''
+    return points.length === 1
+      ? `M ${points[0].x.toFixed(1)} ${points[0].y.toFixed(1)}`
+      : ''
   }
 
   const format = (value: number) => value.toFixed(1)
@@ -231,9 +299,8 @@ function catmullRomPath(points: Point[], tension = 1.15): string {
   return path
 }
 
-function buildJourneyPath(anchors: Point[], containerWidth: number): string {
-  const waypoints = buildJourneyWaypoints(anchors, containerWidth)
-  return catmullRomPath(waypoints)
+function buildJourneyPath(anchors: Point[]): string {
+  return catmullRomPath(anchors)
 }
 
 function BackstoryJourneyArrow({
@@ -270,18 +337,10 @@ function BackstoryJourneyArrow({
     const containerRect = container.getBoundingClientRect()
     const containerWidth = container.offsetWidth
     const gutterX = containerWidth * 0.5
-    const useGutterAnchors = container.classList.contains('backstory-columns')
 
     const nodes = Array.from(nodeMap.entries())
       .map(([id, element]) => ({ id, element }))
       .filter(({ element }) => container.contains(element))
-      .map(({ id, element }) => ({
-        id,
-        element,
-        anchor: useGutterAnchors
-          ? getNodeGutterAnchor(element, containerRect, gutterX)
-          : getNodeCenterAnchor(element, containerRect),
-      }))
 
     if (nodes.length < 2) {
       setPath('')
@@ -289,50 +348,24 @@ function BackstoryJourneyArrow({
       return
     }
 
-    // Start from the top-most text card, then greedily connect to the closest next node.
-    const textNodes = nodes.filter((node) => node.id.endsWith('-text'))
-    const startNode = (textNodes.length ? textNodes : nodes).reduce((best, current) => {
-      if (!best) return current
-      if (current.anchor.y < best.anchor.y - 0.5) return current
-      if (Math.abs(current.anchor.y - best.anchor.y) <= 0.5 && current.anchor.x < best.anchor.x)
-        return current
-      return best
-    }, null as null | (typeof nodes)[number])
+    const orderedAnchors = buildTimelineAnchors(
+      nodeMap,
+      container,
+      containerRect,
+      gutterX,
+    )
 
-    if (!startNode) {
+    if (orderedAnchors.length < 2) {
       setPath('')
       setStartPoint(null)
       return
-    }
-
-    const remaining = new Map(nodes.map((node) => [node.id, node]))
-    remaining.delete(startNode.id)
-    const orderedAnchors: Point[] = [startNode.anchor]
-    let current = startNode
-
-    while (remaining.size) {
-      let closest: (typeof nodes)[number] | null = null
-      let bestDist = Number.POSITIVE_INFINITY
-
-      for (const candidate of remaining.values()) {
-        const d = distanceSq(current.anchor, candidate.anchor)
-        if (d < bestDist) {
-          bestDist = d
-          closest = candidate
-        }
-      }
-
-      if (!closest) break
-      orderedAnchors.push(closest.anchor)
-      remaining.delete(closest.id)
-      current = closest
     }
 
     setDimensions({
       width: containerWidth,
       height: container.offsetHeight,
     })
-    const newPath = buildJourneyPath(orderedAnchors, containerWidth)
+    const newPath = buildJourneyPath(orderedAnchors)
     setPath(newPath)
     setStartPoint(orderedAnchors[0] ?? null)
   }, [containerRef, nodeMapRef])
@@ -442,9 +475,20 @@ function BackstoryTextCard({
       aria-label={label}
     >
       {heading ? <h2>{heading}</h2> : null}
-      {paragraphs.map((paragraph, index) => (
-        <p key={`${label}-${index}`}>{paragraph}</p>
-      ))}
+      {paragraphs.map((paragraph, index) =>
+        paragraph === 'cheeze-icon' ? (
+          <p key={`${label}-${index}`} className="backstory-cheeze-icon-wrap">
+            <img
+              className="backstory-cheeze-icon"
+              src={cheezeIconSrc}
+              alt=""
+              aria-hidden="true"
+            />
+          </p>
+        ) : (
+          <p key={`${label}-${index}`}>{paragraph}</p>
+        ),
+      )}
     </article>
   )
 }
@@ -462,6 +506,8 @@ function BackstoryImageCard({
   onImageLoad?: () => void
   bottomSpace?: number
 }) {
+  const caption = alt.trim()
+
   return (
     <figure
       ref={nodeRef}
@@ -470,8 +516,8 @@ function BackstoryImageCard({
       style={bottomSpace ? { marginBottom: bottomSpace } : undefined}
     >
       <div className="backstory-media-frame">
-        <img src={src} alt={alt} loading="lazy" decoding="async" onLoad={onImageLoad} />
-        <figcaption className="backstory-media-caption">{alt}</figcaption>
+        <img src={src} alt={caption || label} loading="lazy" decoding="async" onLoad={onImageLoad} />
+        {caption ? <figcaption className="backstory-media-caption">{caption}</figcaption> : null}
       </div>
     </figure>
   )
@@ -482,46 +528,30 @@ function BackstoryPair({
   index,
   registerNode,
   onImageLoad,
-  preserveImageBottomSpace = false,
 }: {
   row: BackstoryRow
   index: number
   registerNode: (id: string) => JourneyNodeRef
   onImageLoad?: () => void
-  preserveImageBottomSpace?: boolean
 }) {
-  const text = (
-    <BackstoryTextCard
-      nodeRef={registerNode(`${row.label}-text`)}
-      label={row.label}
-      heading={row.heading}
-      paragraphs={row.paragraphs}
-    />
-  )
+  const nodeKey = `${index}`
 
-  if (!row.hasImage || !row.image) {
-    return text
-  }
-
-  const image = (
-    <BackstoryImageCard
-      {...row.image}
-      nodeRef={registerNode(`${row.label}-image`)}
-      label={row.label}
-      onImageLoad={onImageLoad}
-      bottomSpace={preserveImageBottomSpace ? row.imageBottomSpace : undefined}
-    />
-  )
-
-  return index % 2 === 0 ? (
+  return (
     <>
-      {image}
-      {text}
-    </>
-  ) : (
-    <>
-      {text}
-      {image}
+      {row.hasImage && row.image ? (
+        <BackstoryImageCard
+          {...row.image}
+          nodeRef={registerNode(`${nodeKey}-image`)}
+          label={row.label}
+          onImageLoad={onImageLoad}
+        />
+      ) : null}
+      <BackstoryTextCard
+        nodeRef={registerNode(`${nodeKey}-text`)}
+        label={row.label}
+        heading={row.heading}
+        paragraphs={row.paragraphs}
+      />
     </>
   )
 }
@@ -537,9 +567,9 @@ function renderPrimaryColumnItem(
   if (imageOnLeft && row.hasImage && row.image) {
     return (
       <BackstoryImageCard
-        key={`${row.label}-image`}
+        key={`${index}-image`}
         {...row.image}
-        nodeRef={registerNode(`${row.label}-image`)}
+        nodeRef={registerNode(`${index}-image`)}
         label={row.label}
         onImageLoad={onImageLoad}
         bottomSpace={row.imageBottomSpace}
@@ -550,8 +580,8 @@ function renderPrimaryColumnItem(
   if (!imageOnLeft) {
     return (
       <BackstoryTextCard
-        key={`${row.label}-text`}
-        nodeRef={registerNode(`${row.label}-text`)}
+        key={`${index}-text`}
+        nodeRef={registerNode(`${index}-text`)}
         label={row.label}
         heading={row.heading}
         paragraphs={row.paragraphs}
@@ -573,8 +603,8 @@ function renderSecondaryColumnItem(
   if (imageOnLeft) {
     return (
       <BackstoryTextCard
-        key={`${row.label}-text`}
-        nodeRef={registerNode(`${row.label}-text`)}
+        key={`${index}-text`}
+        nodeRef={registerNode(`${index}-text`)}
         label={row.label}
         heading={row.heading}
         paragraphs={row.paragraphs}
@@ -585,9 +615,9 @@ function renderSecondaryColumnItem(
   if (row.hasImage && row.image) {
     return (
       <BackstoryImageCard
-        key={`${row.label}-image`}
+        key={`${index}-image`}
         {...row.image}
-        nodeRef={registerNode(`${row.label}-image`)}
+        nodeRef={registerNode(`${index}-image`)}
         label={row.label}
         onImageLoad={onImageLoad}
         bottomSpace={row.imageBottomSpace}
@@ -670,18 +700,33 @@ export function BackstoryPage({
             ) : (
               <div ref={journeyRef} className="backstory-stack" aria-label="My journey">
                 {BACKSTORY_ROWS.map((row, index) => (
-                  <section key={`${row.label}-stack`} className="backstory-stack-pair" aria-label={row.label}>
+                  <section
+                    key={`backstory-${index}`}
+                    className="backstory-stack-pair"
+                    aria-label={row.label}
+                  >
                     <BackstoryPair
                       row={row}
                       index={index}
                       registerNode={registerNode}
                       onImageLoad={handleImageLoad}
-                      preserveImageBottomSpace={false}
                     />
                   </section>
                 ))}
               </div>
             )}
+
+            <nav
+              className="nav-panel backstory-catalog-nav"
+              aria-label="Catalog navigation"
+            >
+              <p className="backstory-catalog-nav__copy">
+                FIND ALL OF MY PROJECTS MADE THROUGHOUT MY JOURNEY HERE!
+              </p>
+              <NavButton onClick={onCatalog} href="#/catalog">
+                CATALOG SEARCH
+              </NavButton>
+            </nav>
           </div>
         </section>
       </main>

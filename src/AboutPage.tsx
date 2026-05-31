@@ -46,7 +46,7 @@ export function AboutSection({ onLearnMore }: AboutSectionProps) {
               <b>Hi, I’m Rayan!</b>
               <br />
               <br />
-              I’m from Fremont, CA and I'm currently pursuing a bachelor's degree in{' '}
+              I’m a software developer from Fremont, CA and I'm currently pursuing a bachelor's degree in{' '}
               Computer Science + Education at <b>the University of Illinois at Urbana-Champaign</b>, specializing in human-computer
               interaction and AI engineering.
               <br />
