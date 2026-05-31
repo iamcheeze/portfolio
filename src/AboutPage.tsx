@@ -80,7 +80,7 @@ export function AboutSection({ onLearnMore }: AboutSectionProps) {
               />
             </svg>
           </span>
-          <NavButton onClick={onLearnMore} href={routePath('/backstory')}>
+          <NavButton onClick={onLearnMore} href={routePath('/journey')}>
             MY JOURNEY
           </NavButton>
           <span className="about-journey-hint about-journey-hint--right" aria-hidden="true">

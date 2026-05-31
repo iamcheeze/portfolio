@@ -23,6 +23,7 @@ import {
   getPageFromPath,
   isScrollSection,
   migrateLegacyHashRoute,
+  migrateLegacyPathRoute,
   pageToPath,
   sectionToPath,
   type Page,
@@ -98,6 +99,7 @@ function App() {
   const homeScrollRef = useRef<HomeScrollControls>(null)
   const [page, setPage] = useState<Page>(() => {
     migrateLegacyHashRoute()
+    migrateLegacyPathRoute()
     return getPageFromPath()
   })
   const [isTransitioning, setIsTransitioning] = useState(false)
@@ -223,6 +225,7 @@ function App() {
   useEffect(() => {
     const onLocationChange = () => {
       migrateLegacyHashRoute()
+      migrateLegacyPathRoute()
       const next = getPageFromPath()
 
       if (next === 'catalog') {

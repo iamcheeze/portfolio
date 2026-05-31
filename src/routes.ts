@@ -58,6 +58,7 @@ export function getPageFromPath(): Page {
       return 'about'
     case '/contact':
       return 'experience'
+    case '/journey':
     case '/backstory':
       return 'backstory'
     default: {
@@ -88,7 +89,7 @@ export function pageToPath(page: Page): string {
     case 'about':
       return routePath('/about')
     case 'backstory':
-      return routePath('/backstory')
+      return routePath('/journey')
     default: {
       const highlight = isHighlightId(page) ? getHighlightById(page) : undefined
       return highlight ? routePath(highlight.path) : routePath('/')
@@ -102,6 +103,14 @@ export function migrateLegacyHashRoute(): boolean {
   if (!hash.startsWith('#/')) return false
 
   const legacyPath = normalizePath(hash.slice(1))
-  window.history.replaceState(null, '', routePath(legacyPath))
+  const canonicalPath = legacyPath === '/backstory' ? '/journey' : legacyPath
+  window.history.replaceState(null, '', routePath(canonicalPath))
+  return true
+}
+
+/** Redirect old path URLs (e.g. `/backstory`) to their canonical replacements. */
+export function migrateLegacyPathRoute(): boolean {
+  if (getAppPathname() !== '/backstory') return false
+  window.history.replaceState(null, '', routePath('/journey'))
   return true
 }
