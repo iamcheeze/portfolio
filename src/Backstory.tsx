@@ -11,6 +11,7 @@ import mindlockPresentation from './assets/m2.png'
 import jumpCenter from './assets/MedicalSimulationDesign.jpg'
 
 import { NavButton } from './NavButton'
+import { routePath } from './routes'
 
 const cheezeIconSrc = `${import.meta.env.BASE_URL}cheezeIcon.svg`
 
@@ -723,7 +724,7 @@ export function BackstoryPage({
               <p className="backstory-catalog-nav__copy">
                 FIND ALL OF MY PROJECTS MADE THROUGHOUT MY JOURNEY HERE!
               </p>
-              <NavButton onClick={onCatalog} href="#/catalog">
+              <NavButton onClick={onCatalog} href={routePath('/catalog')}>
                 CATALOG SEARCH
               </NavButton>
             </nav>

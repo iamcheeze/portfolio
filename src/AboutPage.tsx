@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { NavButton } from './NavButton'
+import { routePath } from './routes'
 import rayan1 from './assets/Rayan1.png'
 import rayan2 from './assets/Rayan3.png'
 import rayan3 from './assets/RayanGhosh3.jpg'
@@ -79,7 +80,7 @@ export function AboutSection({ onLearnMore }: AboutSectionProps) {
               />
             </svg>
           </span>
-          <NavButton onClick={onLearnMore} href="#/backstory">
+          <NavButton onClick={onLearnMore} href={routePath('/backstory')}>
             MY JOURNEY
           </NavButton>
           <span className="about-journey-hint about-journey-hint--right" aria-hidden="true">

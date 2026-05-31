@@ -18,12 +18,16 @@ import { PaintTheWorldRedPage } from './PaintTheWorldRedPage'
 import type { HighlightPageProps } from './highlightPageTypes'
 import { SiteFooter } from './SiteFooter'
 import { HomeScrollPage, type HomeScrollControls } from './HomeScrollPage'
+import { isHighlightId, type HighlightId } from './highlightsData'
 import {
-  getHighlightById,
-  getHighlightFromHash,
-  isHighlightId,
-  type HighlightId,
-} from './highlightsData'
+  getPageFromPath,
+  isScrollSection,
+  migrateLegacyHashRoute,
+  pageToPath,
+  sectionToPath,
+  type Page,
+  type ScrollSection,
+} from './routes'
 import { HeroMiniScrollingTrack } from './HeroMiniScrollingTrack'
 import { HomeTrackCard } from './HomeTrackCard'
 import { NavButton } from './NavButton'
@@ -34,10 +38,8 @@ import instagramIcon from './assets/instagramIcon.svg'
 import youtubeIcon from './assets/youtube.svg'
 import itchIcon from './assets/itchIcon.svg'
 import linkedinIcon from './assets/linkedinIcon.svg'
+import { routePath } from './routes'
 import './App.css'
-
-type Page = 'home' | 'experience' | 'catalog' | 'about' | 'backstory' | HighlightId
-type ScrollSection = 'home' | 'about' | 'experience'
 
 const TRANSITION_MS = 420
 
@@ -77,57 +79,6 @@ const socialLinks = [
   },
 ]
 
-/** * Detection logic: GitHub Pages friendly hash check 
- */
-function getPageFromPath(): Page {
-  const hash = window.location.hash
-
-  switch (hash) {
-    case '#/catalog':
-      return 'catalog'
-    case '#/experience':
-      return 'experience'
-    case '#/about':
-      return 'about'
-    case '#/contact':
-      return 'experience'
-    case '#/backstory':
-      return 'backstory'
-    default: {
-      const highlight = getHighlightFromHash(hash)
-      if (highlight) return highlight.id
-      return 'home'
-    }
-  }
-}
-
-function sectionToHash(section: ScrollSection): string {
-  switch (section) {
-    case 'about': return '#/about'
-    case 'experience': return '#/experience'
-    default: return '#/'
-  }
-}
-
-function pageToHash(page: Page): string {
-  switch (page) {
-    case 'catalog': return '#/catalog'
-    case 'experience': return '#/experience'
-    case 'about': return '#/about'
-    case 'backstory': return '#/backstory'
-    default: {
-      const highlight = isHighlightId(page) ? getHighlightById(page) : undefined
-      return highlight?.hash ?? '#/'
-    }
-  }
-}
-
-const SCROLL_SECTIONS: ScrollSection[] = ['home', 'about', 'experience']
-
-function isScrollSection(page: Page): page is ScrollSection {
-  return SCROLL_SECTIONS.includes(page as ScrollSection)
-}
-
 function shuffleItems<T>(items: T[]): T[] {
   const shuffled = [...items]
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -145,15 +96,18 @@ function buildMarqueeTrack(items: ProjectItem[]) {
 function App() {
   const appRef = useRef<HTMLDivElement>(null)
   const homeScrollRef = useRef<HomeScrollControls>(null)
-  const [page, setPage] = useState<Page>(() => getPageFromPath())
+  const [page, setPage] = useState<Page>(() => {
+    migrateLegacyHashRoute()
+    return getPageFromPath()
+  })
   const [isTransitioning, setIsTransitioning] = useState(false)
   const homeTopMarquee = useMemo(() => buildMarqueeTrack(scrollingTrackProjectItems), [])
   const homeBottomMarquee = useMemo(() => buildMarqueeTrack(scrollingTrackProjectItems), [])
 
   const onSectionChange = useCallback((section: ScrollSection) => {
-    const nextHash = sectionToHash(section)
-    if (window.location.hash !== nextHash) {
-      window.history.replaceState(null, '', nextHash)
+    const nextPath = sectionToPath(section)
+    if (window.location.pathname !== nextPath) {
+      window.history.replaceState(null, '', nextPath)
     }
     setPage(section)
   }, [])
@@ -173,8 +127,8 @@ function App() {
       setPage(nextPage)
 
       if (pushHistory) {
-        const nextHash = pageToHash(nextPage)
-        window.history.pushState(null, '', nextHash)
+        const nextPath = pageToPath(nextPage)
+        window.history.pushState(null, '', nextPath)
       }
 
       window.setTimeout(() => {
@@ -185,8 +139,9 @@ function App() {
 
   const openCatalog = useCallback(() => {
     window.scrollTo(0, 0)
-    if (window.location.hash !== '#/catalog') {
-      window.history.pushState(null, '', '#/catalog')
+    const catalogPath = pageToPath('catalog')
+    if (window.location.pathname !== catalogPath) {
+      window.history.pushState(null, '', catalogPath)
     }
     setIsTransitioning(false)
     setPage('catalog')
@@ -199,19 +154,18 @@ function App() {
   }, [page])
 
   const openBackstory = useCallback(() => {
-    if (window.location.hash !== '#/backstory') {
-      window.history.pushState(null, '', '#/backstory')
+    const backstoryPath = pageToPath('backstory')
+    if (window.location.pathname !== backstoryPath) {
+      window.history.pushState(null, '', backstoryPath)
     }
     setIsTransitioning(false)
     setPage('backstory')
   }, [])
 
   const openHighlight = useCallback((id: HighlightId) => {
-    const highlight = getHighlightById(id)
-    if (!highlight) return
-
-    if (window.location.hash !== highlight.hash) {
-      window.history.pushState(null, '', highlight.hash)
+    const highlightPath = pageToPath(id)
+    if (window.location.pathname !== highlightPath) {
+      window.history.pushState(null, '', highlightPath)
     }
     setIsTransitioning(false)
     setPage(id)
@@ -264,10 +218,11 @@ function App() {
   }, [])
 
   /**
-   * Listen for browser back/forward and manual hash edits.
+   * Listen for browser back/forward and manual URL edits.
    */
   useEffect(() => {
     const onLocationChange = () => {
+      migrateLegacyHashRoute()
       const next = getPageFromPath()
 
       if (next === 'catalog') {
@@ -297,10 +252,8 @@ function App() {
       transitionTo(next, false)
     }
 
-    window.addEventListener('hashchange', onLocationChange)
     window.addEventListener('popstate', onLocationChange)
     return () => {
-      window.removeEventListener('hashchange', onLocationChange)
       window.removeEventListener('popstate', onLocationChange)
     }
   }, [transitionTo])
@@ -392,17 +345,17 @@ function App() {
                     >
                       <NavButton
                         onClick={() => homeScrollRef.current?.scrollToSection('experience')}
-                        href="#/experience"
+                        href={routePath('/experience')}
                       >
                         EXPERIENCE
                       </NavButton>
                       <NavButton
                         onClick={() => homeScrollRef.current?.scrollToSection('about')}
-                        href="#/about"
+                        href={routePath('/about')}
                       >
                         WHO AM I?
                       </NavButton>
-                      <NavButton onClick={openCatalog} href="#/catalog">
+                      <NavButton onClick={openCatalog} href={routePath('/catalog')}>
                         CATALOG
                       </NavButton>
                     </nav>

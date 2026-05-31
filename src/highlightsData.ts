@@ -15,7 +15,7 @@ export type HighlightId =
 
 export type HighlightItem = {
   id: HighlightId
-  hash: string
+  path: string
   title: string
   description: string
   subtitle: string
@@ -26,7 +26,7 @@ export type HighlightItem = {
 export const highlightsData: HighlightItem[] = [
   {
     id: 'ards',
-    hash: '#/acute-respiratory-distress',
+    path: '/acute-respiratory-distress',
     title: 'ACUTE RESPIRATORY DISTRESS SIMULATION',
     description:
       'I CREATED AN IMMERSIVE VITALS MONITOR AND VENTILATION SYSTEM FOR OUR VIRTUAL PATIENT, WHICH WE THEN VALIDATED THROUGH USER TESTING AND FEEDBACK WITH 65 M1 MEDICAL STUDENTS!',
@@ -36,7 +36,7 @@ export const highlightsData: HighlightItem[] = [
   },
   {
     id: 'lumbar-puncture',
-    hash: '#/lumbar-puncture-virtual-trainer',
+    path: '/lumbar-puncture-virtual-trainer',
     title: 'LUMBAR PUNCTURE VIRTUAL TRAINER',
     description:
       'I ENGINEERED AN INTERACTIVE 3D RENDERING SYSTEM IN THE LUMBAR PUNCTURE VIRTUAL TRAINER FOR MEDICAL TRAINING AT THE JUMP SIMULATION CENTER!',
@@ -46,7 +46,7 @@ export const highlightsData: HighlightItem[] = [
   },
   {
     id: 'difficult-conversation',
-    hash: '#/difficult-conversation-simulator',
+    path: '/difficult-conversation-simulator',
     title: 'DIFFICULT CONVERSATION SIMULATOR',
     description:
       'I BUILT AN XR CONVERSATION SIMULATOR INTEGRATED WITH AN LLM BACKEND TO CHOOSE CORRECT RESPONSES!',
@@ -56,7 +56,7 @@ export const highlightsData: HighlightItem[] = [
   },
   {
     id: 'mindlock',
-    hash: '#/mindlock-museum',
+    path: '/mindlock-museum',
     title: 'MINDLOCK MUSEUM',
     description:
       'I lead and directed a 17 person team of software developers, 2D/3D artists, and UI/UX designers to create a mixed media detective game!',
@@ -66,7 +66,7 @@ export const highlightsData: HighlightItem[] = [
   },
   {
     id: 'citrus-beatdown',
-    hash: '#/citrus-beatdown',
+    path: '/citrus-beatdown',
     title: 'CITRUS BEATDOWN',
     description:
       'I CREATED A FAST-PACED FIRST-PERSON BEAT \'EM UP WITH TIGHT COMBAT MECHANICS AND POLISHED GAME FEEL, RELEASED ON ITCH.IO!',
@@ -76,7 +76,7 @@ export const highlightsData: HighlightItem[] = [
   },
   {
     id: 'paint-the-world-red',
-    hash: '#/paint-the-world-red',
+    path: '/paint-the-world-red',
     title: 'PAINT THE WORLD RED',
     description:
       'I AM CREATING A NARRATIVE DRIVEN GAME THAT ALLOWS YOU TO TRAVERSE AN OPEN WORLD THROUGH A DYNAMIC COMBAT SYSTEM WHILE DOCUMENTING MY DEVELOPMENT ONLINE!',
@@ -90,8 +90,9 @@ export function getHighlightById(id: HighlightId): HighlightItem | undefined {
   return highlightsData.find((item) => item.id === id)
 }
 
-export function getHighlightFromHash(hash: string): HighlightItem | undefined {
-  return highlightsData.find((item) => item.hash === hash)
+export function getHighlightFromPath(path: string): HighlightItem | undefined {
+  const normalized = path.endsWith('/') && path.length > 1 ? path.slice(0, -1) : path
+  return highlightsData.find((item) => item.path === normalized)
 }
 
 export function isHighlightId(page: string): page is HighlightId {

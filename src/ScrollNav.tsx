@@ -1,4 +1,5 @@
 import { useEffect, useState, type MouseEvent } from 'react'
+import { routePath } from './routes'
 import youtubeIcon from './assets/youtube.svg'
 import instagramIcon from './assets/instagramIcon.svg'
 import linkedinIcon from './assets/linkedinIcon.svg'
@@ -88,7 +89,7 @@ function ScrollNavLinks({
   return (
     <nav className={className} aria-label="Main">
       <ScrollNavLink
-        href="#/experience"
+        href={routePath('/experience')}
         onClick={() => {
           onExperience()
           afterNav()
@@ -97,7 +98,7 @@ function ScrollNavLinks({
         short="EXPERIENCE"
       />
       <ScrollNavLink
-        href="#/about"
+        href={routePath('/about')}
         onClick={() => {
           onAbout()
           afterNav()
@@ -106,7 +107,7 @@ function ScrollNavLinks({
         short="ABOUT"
       />
       <ScrollNavLink
-        href="#/catalog"
+        href={routePath('/catalog')}
         onClick={() => {
           onCatalog()
           afterNav()
