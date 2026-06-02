@@ -132,7 +132,7 @@ export const projectItems: ProjectItem[] = [
     label: 'Project Director',
     title: 'Eagle Quest',
     image: eagleQuestThumbnail,
-    href: 'https://iamcheeze.itch.io/eagle-quest',
+    href: 'https://ahs-game-development-club.itch.io/eagle-quest',
     tag: 'Project Leadership',
     includeInScrollingTracks: true,
   },
