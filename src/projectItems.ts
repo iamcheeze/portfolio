@@ -58,7 +58,7 @@ export const projectTags: ProjectTag[] = [
 export const projectItems: ProjectItem[] = [
   {
     label: 'Medical Simulation & AI Engineer',
-    title: 'Accute Respiratory Distress Simulation',
+    title: 'Acute Respiratory Distress Simulation',
     image: acuteRespiratoryDistressSimulationThumbnail,
     href: 'https://medicine.illinois.edu/innovation/jumpsimulationcenter',
     tag: 'Professional Project',
