@@ -10,9 +10,6 @@ import UIUC from './assets/UIUC.jpeg'
 import mindlockPresentation from './assets/m2.png'
 import jumpCenter from './assets/MedicalSimulationDesign.jpg'
 
-import { NavButton } from './NavButton'
-import { routePath } from './routes'
-
 const cheezeIconSrc = `${import.meta.env.BASE_URL}cheezeIcon.svg`
 
 type BackstoryParagraph = string | 'cheeze-icon'
@@ -717,17 +714,60 @@ export function BackstoryPage({
               </div>
             )}
 
-            <nav
-              className="nav-panel backstory-catalog-nav"
-              aria-label="Catalog navigation"
-            >
+            <div className="backstory-catalog-actions" aria-label="Catalog navigation">
               <p className="backstory-catalog-nav__copy">
                 FIND ALL OF MY PROJECTS MADE THROUGHOUT MY JOURNEY HERE!
               </p>
-              <NavButton onClick={onCatalog} href={routePath('/catalog')}>
-                CATALOG SEARCH
-              </NavButton>
-            </nav>
+              <div className="experience-projects-actions">
+                <span className="about-journey-hint about-journey-hint--left" aria-hidden="true">
+                  <svg
+                    className="about-journey-hint-arrow"
+                    width="36"
+                    height="20"
+                    viewBox="0 0 36 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M4 10H20M20 4L26 10L20 16"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+                <button
+                  type="button"
+                  className="glow-cta"
+                  onClick={onCatalog}
+                  aria-label="Browse the full project catalog"
+                >
+                  <span className="glow-cta-glow" aria-hidden="true" />
+                  <span className="glow-cta-face">
+                    <span className="glow-cta-label">PROJECTS</span>
+                  </span>
+                </button>
+                <span className="about-journey-hint about-journey-hint--right" aria-hidden="true">
+                  <svg
+                    className="about-journey-hint-arrow"
+                    width="36"
+                    height="20"
+                    viewBox="0 0 36 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M32 10H16M16 4L10 10L16 16"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
+              </div>
+            </div>
           </div>
         </section>
       </main>
