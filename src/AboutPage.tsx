@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { NavButton } from './NavButton'
 import { routePath } from './routes'
 import rayan1 from './assets/Rayan1.png'
 import rayan2 from './assets/Rayan3.png'
@@ -80,9 +79,23 @@ export function AboutSection({ onLearnMore }: AboutSectionProps) {
               />
             </svg>
           </span>
-          <NavButton onClick={onLearnMore} href={routePath('/journey')}>
-            MY JOURNEY
-          </NavButton>
+          <button
+            type="button"
+            className="glow-cta"
+            onClick={() => {
+              if (onLearnMore) {
+                onLearnMore()
+              } else {
+                window.location.assign(routePath('/journey'))
+              }
+            }}
+            aria-label="Learn more about my journey"
+          >
+            <span className="glow-cta-glow" aria-hidden="true" />
+            <span className="glow-cta-face">
+              <span className="glow-cta-label">MY JOURNEY</span>
+            </span>
+          </button>
           <span className="about-journey-hint about-journey-hint--right" aria-hidden="true">
             <svg
               className="about-journey-hint-arrow"

@@ -23,7 +23,7 @@ export function CardButton({
 }: CardButtonProps) {
   return (
     <a
-      className={className ? `card-button ${className}` : 'card-button'}
+      className={className ? `highlight-grid-item ${className}` : 'highlight-grid-item'}
       href={href}
       target="_blank"
       rel="noreferrer"
@@ -32,12 +32,12 @@ export function CardButton({
       aria-label={`${label}: ${title}`}
       style={style}
     >
-      <div className="card-button-image">
+      <div className="highlight-grid-item-image" aria-hidden="true">
         <img src={image} alt="" />
       </div>
-      <div className="card-button-copy">
-        <p>{label}</p>
-        <h2>{title}</h2>
+      <div className="highlight-grid-item-copy">
+        <span className="highlight-grid-item-subtitle">{label}</span>
+        <h2 className="highlight-grid-item-title">{title}</h2>
       </div>
     </a>
   )

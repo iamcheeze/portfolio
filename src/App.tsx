@@ -359,7 +359,7 @@ function App() {
                         WHO AM I?
                       </NavButton>
                       <NavButton onClick={openCatalog} href={routePath('/catalog')}>
-                        CATALOG
+                        PROJECTS
                       </NavButton>
                     </nav>
 

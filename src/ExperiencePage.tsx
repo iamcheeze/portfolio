@@ -1,4 +1,3 @@
-import { NavButton } from './NavButton'
 import { highlightsData, type HighlightId } from './highlightsData'
 
 type ExperiencePageProps = {
@@ -52,41 +51,55 @@ export function ExperiencePage({ onCatalog, onHighlight }: ExperiencePageProps) 
           ))}
         </div>
 
-          {/* <div className="experience-marquee" aria-label="Experience image placeholders">
-          <div className="experience-track">
-            {scrollingItems.map((item, index) => {
-              const isDuplicate = index >= scrollingTrackProjectItems.length
-
-              return (
-                <CardButton
-                  key={`${item.label}-${index}`}
-                  href={item.href}
-                  image={item.image}
-                  label={item.label}
-                  title={item.title}
-                  aria-hidden={isDuplicate}
-                  tabIndex={isDuplicate ? -1 : 0}
-                />
-              )
-            })}
-          </div>
-        </div>*/}
-        <nav className="nav-panel" aria-label="Experience navigation" style={{ display: 'block', padding: '1.5rem' }}>
-          <p
-            style={{
-              margin: 0,
-              fontSize: 'clamp(0.85rem, 1.8vw, 1.2rem)',
-              color: 'var(--yellow)',
-              lineHeight: '1.5',
-            }}
+        <div className="experience-projects-actions">
+          <span className="about-journey-hint about-journey-hint--left" aria-hidden="true">
+            <svg
+              className="about-journey-hint-arrow"
+              width="36"
+              height="20"
+              viewBox="0 0 36 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M4 10H20M20 4L26 10L20 16"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <button
+            type="button"
+            className="glow-cta"
+            onClick={onCatalog}
+            aria-label="Browse the full project catalog"
           >
-            USE THE CATALOG SEARCH TO BROWSE MY ENTIRE PROJECT ARCHIVE! <br />
-            <br />
-            <span style={{ display: 'inline-block', margin: '0 0.5rem', verticalAlign: 'middle' }}>
-              <NavButton onClick={onCatalog}>CATALOG SEARCH</NavButton>
+            <span className="glow-cta-glow" aria-hidden="true" />
+            <span className="glow-cta-face">
+              <span className="glow-cta-label">PROJECTS</span>
             </span>
-          </p>
-        </nav>
+          </button>
+          <span className="about-journey-hint about-journey-hint--right" aria-hidden="true">
+            <svg
+              className="about-journey-hint-arrow"
+              width="36"
+              height="20"
+              viewBox="0 0 36 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M32 10H16M16 4L10 10L16 16"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+        </div>
       </section>
     </main>
   )
