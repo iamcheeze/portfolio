@@ -31,6 +31,7 @@ import DCS from './assets/DCS.png'
 import SDOH from './assets/SDOH.png'
 import DEMOCRACYAR from './assets/DemocracyAR.png'
 import acuteRespiratoryDistressSimulationThumbnail from './assets/ARDSThumbnail.png'
+import thinkFastLogo from './assets/ThinkFastLogo.png'
 
 export type ProjectItem = {
   label: string
@@ -93,6 +94,14 @@ export const projectItems: ProjectItem[] = [
     title: 'CITRUS BEATDOWN',
     image: citrusBeatdownThumbnail,
     href: 'https://iamcheeze.itch.io/citrus-beatdown',
+    tag: 'Personal Project',
+    includeInScrollingTracks: true,
+  },
+  {
+    label: 'Personal Project',
+    title: 'THINK FAST',
+    image: thinkFastLogo,
+    href: 'https://iamcheeze.itch.io/think-fast',
     tag: 'Personal Project',
     includeInScrollingTracks: true,
   },
